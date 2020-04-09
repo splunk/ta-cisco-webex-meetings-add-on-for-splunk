@@ -1,0 +1,14 @@
+[props/webex%3Ameeting%3Alog]
+owner = admin
+version = 8.0.2
+modtime = 1586364348.232837000
+
+[props/source%3A%3A...ta-webex-meetings-add-on-for-splunk%2A.log%2A]
+owner = admin
+version = 8.0.2
+modtime = 1586364348.617283000
+
+[props/source%3A%3A...ta_webex_meetings_add_on_for_splunk%2A.log%2A]
+owner = admin
+version = 8.0.2
+modtime = 1586364348.944887000
