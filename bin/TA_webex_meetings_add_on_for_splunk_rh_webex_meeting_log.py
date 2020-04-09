@@ -77,7 +77,7 @@ fields = [
         'start_time_end',
         required=False,
         encrypted=False,
-        default=None,
+        default='04/01/2050 10:00:00',
         validator=validator.String(
             min_len=0, 
             max_len=8192, 

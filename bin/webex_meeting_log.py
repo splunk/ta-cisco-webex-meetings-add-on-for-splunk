@@ -46,7 +46,7 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
         For customized inputs, hard code the arguments here to hide argument detail from users.
         For other input types, arguments should be get from input_module. Defining new input types could be easier.
         """
-        scheme.add_argument(smi.Argument("site_nmae", title="Site Nmae",
+        scheme.add_argument(smi.Argument("site_nmae", title="Site Name",
                                          description="This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://meetingsamer.webex.com specify meetingsamer",
                                          required_on_create=True,
                                          required_on_edit=False))
@@ -58,12 +58,12 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
                                          description="The login password associated with the Email.",
                                          required_on_create=True,
                                          required_on_edit=False))
-        scheme.add_argument(smi.Argument("start_time_start", title="Start Time Start",
-                                         description="This is in conjunction with Start Time End to specify the start time scope of the meetings that you want to ingest.  Format: MM/DD/YYYY hh:mm:ss",
+        scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
+                                         description="This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
                                          required_on_create=True,
                                          required_on_edit=False))
-        scheme.add_argument(smi.Argument("start_time_end", title="Start Time End",
-                                         description="This is in conjunction with Start Time Start to specify the start time scope of the meetings that you want to ingest. Format: MM/DD/YYYY hh:mm:ss",
+        scheme.add_argument(smi.Argument("start_time_end", title="End Time",
+                                         description="This is the time to where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
                                          required_on_create=False,
                                          required_on_edit=False))
         return scheme

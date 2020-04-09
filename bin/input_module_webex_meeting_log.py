@@ -7,10 +7,8 @@ import time
 import datetime
 import requests
 import xml.etree.ElementTree as ET
-from xml.etree import cElementTree as ElementTree
-
+#from xml.etree import cElementTree as ElementTree
 from io import StringIO
-
 from collections import defaultdict
 from xml.etree import cElementTree as ETree
 import json
@@ -37,6 +35,15 @@ def validate_input(helper, definition):
     # password = definition.parameters.get('password', None)
     # start_time_start = definition.parameters.get('start_time_start', None)
     # start_time_end = definition.parameters.get('start_time_end', None)
+    start_time_start = definition.parameters.get('start_time_start', None)
+    start_time_end = definition.parameters.get('start_time_end', None)
+    try:
+        datetime.datetime.strptime(start_time_start, '%m/%d/%Y %H:%M:%S')
+        if start_time_end:
+            datetime.datetime.strptime(start_time_end, '%m/%d/%Y %H:%M:%S')
+    except ValueError:
+        raise ValueError(
+            "Incorrect data format, time should be MM/DD/YYYY hh:mm:ss")
     pass
 
 
@@ -154,6 +161,9 @@ def collect_events(helper, ew):
     opt_start_time_start = helper.get_arg('start_time_start')
     opt_start_time_end = helper.get_arg('start_time_end')
 
+    if not opt_start_time_end:
+        opt_start_time_end = "04/10/2050 10:30:34"
+
     offset = 1
 
     # create checkpoint key
@@ -164,7 +174,7 @@ def collect_events(helper, ew):
         offset = 1
     else:
         offset = int(offset)
-    limit = 4
+    limit = 100
     records = limit
     while(records == limit):
         records = fetch_webex_logs(opt_username, opt_password, opt_site_nmae,

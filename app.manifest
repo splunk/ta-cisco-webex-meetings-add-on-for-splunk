@@ -15,7 +15,7 @@
       }
     ],
     "releaseDate": null,
-    "description": "",
+    "description": "This Addon allows you to get data from WebEx meetings API.",
     "classification": {
       "intendedAudience": null,
       "categories": [],

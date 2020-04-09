@@ -91,7 +91,7 @@
                     },
                     {
                         "field": "site_nmae",
-                        "label": "Site Nmae"
+                        "label": "Site Name"
                     },
                     {
                         "field": "username",
@@ -103,11 +103,11 @@
                     },
                     {
                         "field": "start_time_start",
-                        "label": "Start Time Start"
+                        "label": "Begin Time"
                     },
                     {
                         "field": "start_time_end",
-                        "label": "Start Time End"
+                        "label": "End Time"
                     }
                 ],
                 "actions": [
@@ -178,7 +178,7 @@
                         },
                         {
                             "field": "site_nmae",
-                            "label": "Site Nmae",
+                            "label": "Site Name",
                             "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://meetingsamer.webex.com specify meetingsamer",
                             "required": true,
                             "type": "text",
@@ -230,8 +230,8 @@
                         },
                         {
                             "field": "start_time_start",
-                            "label": "Start Time Start",
-                            "help": "This is in conjunction with Start Time End to specify the start time scope of the meetings that you want to ingest.  Format: MM/DD/YYYY hh:mm:ss",
+                            "label": "Begin Time",
+                            "help": "This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
                             "required": true,
                             "type": "text",
                             "validators": [
@@ -248,10 +248,11 @@
                         },
                         {
                             "field": "start_time_end",
-                            "label": "Start Time End",
-                            "help": "This is in conjunction with Start Time Start to specify the start time scope of the meetings that you want to ingest. Format: MM/DD/YYYY hh:mm:ss",
+                            "label": "End Time",
+                            "help": "This is the time to where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
                             "required": false,
                             "type": "text",
+                            "defaultValue": "04/01/2050 10:00:00",
                             "validators": [
                                 {
                                     "type": "string",
