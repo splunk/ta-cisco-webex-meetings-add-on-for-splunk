@@ -30,7 +30,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 6. Please check for any errors and resolve them before using the search app to check for the pulled-in data.
 
 ## Example(s)
-![Configuration Screenshot](Configuration_Screenshot.png "Configuration Screenshot"| width=100)
+<img src="Configuration_Screenshot.png"  width="600" height="450">
 
 
 ## Credits & Acknowledgements (optional)
