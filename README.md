@@ -4,7 +4,7 @@
 
 ## Getting Started
 This is a TA to pull in data from WebEx Meetings XML API. 
-This is the `LstmeetingusageHistory` [API endpoint](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) being hit to fetch data for the meetings. 
+The `LstmeetingusageHistory` [API endpoint](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) is being hit to fetch data for the meetings. 
 
 #### Installation and Configuration Steps
 This application can be installed on-prem and cloud. The TA can be downloaded from the JIRA ticket / [Drive link]()
