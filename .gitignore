@@ -4,7 +4,7 @@
 .vscode
 
 # Splunk app local files
-# local
+local
 # (Normally we'd exclude the entire "metadata" directory.
 #  However we must preserve metadata/default.meta so that eventgen works.)
-# local.meta
+local.meta
