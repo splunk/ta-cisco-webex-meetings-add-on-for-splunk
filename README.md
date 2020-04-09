@@ -30,7 +30,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 6. Please check for any errors and resolve them before using the search app to check for the pulled-in data.
 
 ## Example(s)
-![Configuration Screenshot](https://gitlab.com/splunk-fdse/modular-inputs/ta-webex-meetings-add-on-for-splunk/-/blob/master/Configuration_Screenshot.png "Configuration Screenshot")
+![Configuration Screenshot](Configuration_Screenshot.png "Configuration Screenshot"| width=100)
 
 
 ## Credits & Acknowledgements (optional)
