@@ -7,7 +7,7 @@ This is a TA to pull in data from WebEx Meetings XML API.
 The `LstmeetingusageHistory` [API endpoint](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) is being hit to fetch data for the meetings. 
 
 #### Installation and Configuration Steps
-This application can be installed on-prem and cloud. The TA can be downloaded from the [JIRA ticket](https://jira.splunk.com/browse/FDSE-612) / [Drive link](https://drive.google.com)
+This application can be installed on-prem and cloud. The TA can be downloaded from the [JIRA ticket](https://jira.splunk.com/browse/FDSE-612) / [Drive link](https://drive.google.com).
 
 ##### Installation Steps for `on-prem`
 Install the TA on one of the Heavy Forwarder(s).
