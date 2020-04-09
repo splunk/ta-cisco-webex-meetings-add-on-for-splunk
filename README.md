@@ -1,48 +1,37 @@
-# Title
-Description of the project: self-explanatory, clearly state the scope. Re-phrase and summarize JIRA's threads when necessary.
+# Splunk-TA for WebEx Meetings
 
-Provide technical insights by referencing specific environments, frameworks, tools, libraries used (incl. versions).
-
-Provide link to the JIRA ticket related to this project.
-
-
-## Features (optional)
-What makes your project stand out? Highlight relevant features.
-
-## Table of Contents (optional)
-Only in case of very long READMEs
+> The **Splunk-TA for Webex Meetings** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 ## Getting Started
-### Requirements (optional)
-What things you need to have installed to run installation smoothly. Add also details on how to install them.
+This is a TA to pull in data from WebEx Meetings XML API. 
+The `LstmeetingusageHistory` [API endpoint](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) is being hit to fetch data for the meetings. 
 
-### Installation
-Tell other users how to install your project locally. Optionally, include a gif to make the process even more clear for other people.
+#### Installation and Configuration Steps
+This application can be installed on-prem and cloud. The TA can be downloaded from the [JIRA ticket](https://jira.splunk.com/browse/FDSE-612) / [Drive link](https://drive.google.com).
 
-### Usage
-Instruct other people on how to use your project after they’ve installed it. This would also be a good place to include screen shots of your project in action.
+##### Installation Steps for `on-prem`
+Install the TA on one of the Heavy Forwarder(s).
 
-### Tests (optional)
-Explain how to run the automated tests for this system
+##### Installation Steps for `cloud`
+Create a support ticket with `APP-CERT` reference to get it installed on the Cloud instance *OR* follow the cloud-ops steps to install non-published applications.
+
+#### Configuration steps
+The configuration steps are common for `on-prem` and `cloud`. Please follow the following steps in order:
+1. Open the Web UI for the Heavy Forwarder (or IDM).
+2. Access the TA from the list of applications.
+3. Click on `Add New Input` button on the top right corner.
+4. Enter the following details:
+  - **Site Name** (_required_): This identifies the Webex site you are targeting with your add-on. For example, if the URL is `https://splunk.webex.com`, the Webex Site that you have to enter is `splunk`.
+  - **Username** (_required_): E-mail address of the host or admin account making the request. For example: `splunker@splunk.com`.
+  - **Password** (_required_): Password of the account associated with the e-mail address above. The password will be masked.
+  - **Begin Time** (_required_): This is the timeframe starting from where you want to ingest the data. Format for the Start Time would be `MM/DD/YYYY hh:mm:ss`.
+  - **End Time** (_optional_): This is the timeframe until you want to ingest the data . Format for the End Time would be `MM/DD/YYYY hh:mm:ss`.
+5. Click on the `Add` green button on the bottom right of the pop up box.
+6. Please check for any errors and resolve them before using the search app to check for the pulled-in data.
 
 ## Example(s)
-Add here examples of usages. Another good place to include screenshots or gifs.
+<img src="Configuration_Screenshot.png"  width="600" height="450">
 
-## Contributing
-Explain here how users can contribute. For example:
-* make a PR,
-* create an issue,
-* branch the code,
-* use [gitflow](https://jeffkreeftmeijer.com/git-flow/),
-* etc
-
-If very long, consider adding `CONTRIBUTING.md` to the repository for details on code of conduct, the process for submitting pull requests, etc.
-
-## References & Takeaway (optional)
-List encountered challenges and what contributed to their resolution by providing relevant links. 
 
 ## Credits & Acknowledgements (optional)
-Give proper credits. This could be a link to any repo which inspired you to build this project, any blogposts or links to people who contributed in this project.
-
-## License
-Short snippet linking to `LICENSE.md`
+> Please feel free to contact fdse@splunk.com or #team-fdse on Slack for any more information.
