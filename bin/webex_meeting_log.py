@@ -58,6 +58,10 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
                                          description="The login password associated with the Email.",
                                          required_on_create=True,
                                          required_on_edit=False))
+        scheme.add_argument(smi.Argument("endpoint", title="Endpoint",
+                                         description="Please choose the endpoint that is used to fetch data back.",
+                                         required_on_create=True,
+                                         required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
                                          description="This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
                                          required_on_create=True,

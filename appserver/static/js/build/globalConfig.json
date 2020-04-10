@@ -102,6 +102,10 @@
                         "label": "Password"
                     },
                     {
+                        "field": "endpoint",
+                        "label": "Endpoint"
+                    },
+                    {
                         "field": "start_time_start",
                         "label": "Begin Time"
                     },
@@ -227,6 +231,43 @@
                                     "errorMsg": "Max length of password is 8192"
                                 }
                             ]
+                        },
+                        {
+                            "field": "endpoint",
+                            "label": "Endpoint",
+                            "help": "Please choose the endpoint that is used to fetch data back.",
+                            "required": true,
+                            "type": "multipleSelect",
+                            "defaultValue": "LstmeetingusageHistory",
+                            "options": {
+                                "delimiter": "~",
+                                "items": [
+                                    {
+                                        "value": "LstmeetingusageHistory",
+                                        "label": "LstmeetingusageHistory"
+                                    },
+                                    {
+                                        "value": "LstsupportsessionHistory",
+                                        "label": "LstsupportsessionHistory"
+                                    },
+                                    {
+                                        "value": "LsttrainingsessionHistory",
+                                        "label": "LsttrainingsessionHistory"
+                                    },
+                                    {
+                                        "value": "LsteventsessionHistory",
+                                        "label": "LsteventsessionHistory"
+                                    },
+                                    {
+                                        "value": "LstrecordaccessHistory",
+                                        "label": "LstrecordaccessHistory"
+                                    },
+                                    {
+                                        "value": "LstsummaryMeeting",
+                                        "label": "LstsummaryMeeting"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "field": "start_time_start",

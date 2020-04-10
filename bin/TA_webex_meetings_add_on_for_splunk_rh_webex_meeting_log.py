@@ -64,6 +64,13 @@ fields = [
         )
     ), 
     field.RestField(
+        'endpoint',
+        required=True,
+        encrypted=False,
+        default='LstmeetingusageHistory',
+        validator=None
+    ), 
+    field.RestField(
         'start_time_start',
         required=True,
         encrypted=False,
