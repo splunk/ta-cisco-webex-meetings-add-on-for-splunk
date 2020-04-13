@@ -103,7 +103,7 @@
                     },
                     {
                         "field": "endpoint",
-                        "label": "Endpoint"
+                        "label": "Endpoints"
                     },
                     {
                         "field": "start_time_start",
@@ -234,8 +234,8 @@
                         },
                         {
                             "field": "endpoint",
-                            "label": "Endpoint",
-                            "help": "Please choose the endpoint that is used to fetch data back.",
+                            "label": "Endpoints",
+                            "help": "Please choose the endpoints that are used to fetch data back.",
                             "required": true,
                             "type": "multipleSelect",
                             "defaultValue": "LstmeetingusageHistory",
@@ -244,27 +244,27 @@
                                 "items": [
                                     {
                                         "value": "LstmeetingusageHistory",
-                                        "label": "LstmeetingusageHistory"
+                                        "label": "Meeting Usage History"
                                     },
                                     {
                                         "value": "LstsupportsessionHistory",
-                                        "label": "LstsupportsessionHistory"
+                                        "label": "Support Session History"
                                     },
                                     {
                                         "value": "LsttrainingsessionHistory",
-                                        "label": "LsttrainingsessionHistory"
+                                        "label": "Training Session History"
                                     },
                                     {
                                         "value": "LsteventsessionHistory",
-                                        "label": "LsteventsessionHistory"
+                                        "label": "Event Session History"
                                     },
                                     {
                                         "value": "LstrecordaccessHistory",
-                                        "label": "LstrecordaccessHistory"
+                                        "label": "Recorded Access History"
                                     },
                                     {
                                         "value": "LstsummaryMeeting",
-                                        "label": "LstsummaryMeeting"
+                                        "label": "List Meetings"
                                     }
                                 ]
                             }
