@@ -58,13 +58,17 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
                                          description="The login password associated with the Email.",
                                          required_on_create=True,
                                          required_on_edit=False))
-        scheme.add_argument(smi.Argument("endpoint", title="Endpoints",
-                                         description="Please choose the endpoints that are used to fetch data back.",
-                                         required_on_create=True,
+        scheme.add_argument(smi.Argument("live", title="Continuous Monitoring",
+                                         description="Use is when not retrieving historical endpoints",
+                                         required_on_create=False,
+                                         required_on_edit=False))
+        scheme.add_argument(smi.Argument("endpoint", title="Historical Endpoints",
+                                         description="Please choose the historical endpoints that are used to fetch data back.",
+                                         required_on_create=False,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
                                          description="This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
-                                         required_on_create=True,
+                                         required_on_create=False,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_end", title="End Time",
                                          description="This is the time to where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
@@ -89,6 +93,7 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
 
     def get_checkbox_fields(self):
         checkbox_fields = []
+        checkbox_fields.append("live")
         return checkbox_fields
 
     def get_global_checkbox_fields(self):

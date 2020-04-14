@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-webex-meetings-add-on-for-splunk",
         "displayName": "WebEx Meetings Add-on for Splunk",
-        "version": "1.0.0",
+        "version": "1.0.2",
         "apiVersion": "3.0.0",
         "restRoot": "TA_webex_meetings_add_on_for_splunk"
     },
@@ -102,8 +102,12 @@
                         "label": "Password"
                     },
                     {
+                        "field": "live",
+                        "label": "Continuous Monitoring"
+                    },
+                    {
                         "field": "endpoint",
-                        "label": "Endpoints"
+                        "label": "Historical Endpoints"
                     },
                     {
                         "field": "start_time_start",
@@ -233,12 +237,18 @@
                             ]
                         },
                         {
+                            "field": "live",
+                            "label": "Continuous Monitoring",
+                            "help": "Use is when not retrieving historical endpoints",
+                            "required": false,
+                            "type": "checkbox"
+                        },
+                        {
                             "field": "endpoint",
-                            "label": "Endpoints",
-                            "help": "Please choose the endpoints that are used to fetch data back.",
-                            "required": true,
+                            "label": "Historical Endpoints",
+                            "help": "Please choose the historical endpoints that are used to fetch data back.",
+                            "required": false,
                             "type": "multipleSelect",
-                            "defaultValue": "LstmeetingusageHistory",
                             "options": {
                                 "delimiter": "~",
                                 "items": [
@@ -261,10 +271,6 @@
                                     {
                                         "value": "LstrecordaccessHistory",
                                         "label": "Recorded Access History"
-                                    },
-                                    {
-                                        "value": "LstsummaryMeeting",
-                                        "label": "List Meetings"
                                     }
                                 ]
                             }
@@ -273,7 +279,7 @@
                             "field": "start_time_start",
                             "label": "Begin Time",
                             "help": "This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
-                            "required": true,
+                            "required": false,
                             "type": "text",
                             "validators": [
                                 {
