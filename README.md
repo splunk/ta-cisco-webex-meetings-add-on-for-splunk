@@ -26,7 +26,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
   - **Password** (_required_): Password of the account associated with the e-mail address above. The password will be masked.
   - **Continuous Monitoring**: Check this when retrieving data from Live Endpoint. Note: Pleae leave Historical Endpoints and Begin Time as blank 
   - **Historical Endpoints** : Use this when retrieving data from Historical Endpoints. Note: Please specify a Begin Time below and do not check the Continuous Monitoring checkbox.
-  - **Begin Time** (_required_): This is the timeframe starting from where you want to ingest the data. Please enter UTC time. Format for the Start Time would be `MM/DD/YYYY hh:mm:ss`.
+  - **Begin Time**: This is the timeframe starting from where you want to ingest the data. Please enter UTC time. Format for the Start Time would be `MM/DD/YYYY hh:mm:ss`.
 
 5. Click on the `Add` green button on the bottom right of the pop up box.
 6. Please check for any errors and resolve them before using the search app to check for the pulled-in data.
