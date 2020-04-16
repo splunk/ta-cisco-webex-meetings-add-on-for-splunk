@@ -14,7 +14,7 @@ import json
 from MaxStack_list import MaxStack_list
 
 
-DEBUG_WRITEEV = True
+# DEBUG_WRITEEV = True
 tag_map = {
     "LstmeetingusageHistory": "meetingUsageHistory",
     "LsteventsessionHistory": "eventSessionHistory",
@@ -47,7 +47,7 @@ timestamp_map = {
     "LstsummarySession": "startTime"
 }
 maxStack = MaxStack_list()
-timezone = 20  # "4": "GMT-08:00, Pacific",
+timezone = 20
 
 '''
     IMPORTANT
