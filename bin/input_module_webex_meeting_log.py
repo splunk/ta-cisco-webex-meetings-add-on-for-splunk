@@ -76,7 +76,7 @@ def validate_input(helper, definition):
 
     if live == "1" and start_time_start:
         raise ValueError(
-            "Start time is not required for Continuous Monitoring. '{}' live:{}, start_time_start:{}".format(live, type(live), type(start_time_start)))
+            "Start time is not required for Continuous Monitoring.")
 
     try:
         # if not live:
@@ -128,7 +128,7 @@ def collect_events(helper, ew):
     # Live data - time slice
     # start time = last_run
     # end time = now() in user selected time zone
-    limit = 500
+    limit = 1000
     if opt_live is True:
         # do the time magic
         # run the unique endpoint
