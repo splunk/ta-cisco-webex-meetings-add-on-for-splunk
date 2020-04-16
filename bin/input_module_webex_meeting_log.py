@@ -7,11 +7,11 @@ import time
 import datetime
 import requests
 import xml.etree.ElementTree as ET
-# from xml.etree import cElementTree as ElementTree
 from io import StringIO
 from collections import defaultdict
 from xml.etree import cElementTree as ETree
 import json
+from MaxStack_list import MaxStack_list
 
 
 DEBUG_WRITEEV = True
@@ -35,6 +35,19 @@ sourcetype_map = {
     "LstsummarySession": "cisco:webex:session:list"
 }
 
+# use this for timestamp checkpoint
+# remove it if offset work
+timestamp_map = {
+    "LstmeetingusageHistory": "meetingStartTime",
+    "LsteventsessionHistory": "sessionStartTime",
+    "LstrecordaccessHistory": "creationTime",
+    "LstsupportsessionHistory": "sessionStartTime",
+    "LsttrainingsessionHistory": "sessionStartTime",
+    "LstsummaryMeeting": "startDate",
+    "LstsummarySession": "startTime"
+}
+maxStack = MaxStack_list()
+timezone = 20  # "4": "GMT-08:00, Pacific",
 
 '''
     IMPORTANT
@@ -60,10 +73,16 @@ def validate_input(helper, definition):
     start_time_start = definition.parameters.get('start_time_start', None)
     start_time_end = definition.parameters.get('start_time_end', None)
     live = definition.parameters.get('live', None)
+
+    if live == "1" and start_time_start:
+        raise ValueError(
+            "Start time is not required for Continuous Monitoring. '{}' live:{}, start_time_start:{}".format(live, type(live), type(start_time_start)))
+
     try:
         # if not live:
         if start_time_start:
-            datetime.datetime.strptime(start_time_start, '%m/%d/%Y %H:%M:%S')
+            datetime.datetime.strptime(
+                start_time_start, '%m/%d/%Y %H:%M:%S')
         if start_time_end:
             datetime.datetime.strptime(start_time_end, '%m/%d/%Y %H:%M:%S')
     except ValueError:
@@ -76,13 +95,13 @@ def collect_events(helper, ew):
     """Implement your data collection logic here
 
     """
-    opt_site_nmae = helper.get_arg('site_nmae')
+    opt_site_name = helper.get_arg('site_nmae')
     opt_username = helper.get_arg('username')
     opt_password = helper.get_arg('password')
     opt_start_time_start = helper.get_arg('start_time_start')
-    opt_start_time_end = helper.get_arg('start_time_end')
+    # opt_start_time_end = helper.get_arg('start_time_end')
     opt_endpoints = helper.get_arg('endpoint')
-    opt_interval = helper.get_arg('interval')
+    opt_interval = int(helper.get_arg('interval'))
     # opt_timezone = helper.get_arg('timezone')
     opt_live = helper.get_arg('live')
 
@@ -109,14 +128,14 @@ def collect_events(helper, ew):
     # Live data - time slice
     # start time = last_run
     # end time = now() in user selected time zone
-    limit = 100
+    limit = 500
     if opt_live is True:
         # do the time magic
         # run the unique endpoint
         # End time : time.now -> convert to epoch
         # Start time : end time - 600
         # Then query the live session endpoint with these parameters, along with timezone (if applicable)
-        opt_interval = 60*60*2
+        # opt_interval = 600
         opt_endpoint = "LstsummarySession"
         key = "{}_{}_processing".format(
             helper.get_input_stanza_names(), opt_endpoint)
@@ -128,80 +147,91 @@ def collect_events(helper, ew):
             start_time = datetime.datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-        end_time = datetime.datetime.now().strftime("%s")
+        end_time_epoch = datetime.datetime.utcnow().strftime("%s")
 
         if start_time is None:
-            start_time = int(end_time) - opt_interval + 1
-            helper.log_info("type of start time: {}".format(type(start_time)))
-            helper.log_info("***start time***: {}".format(start_time))
+            start_time = int(end_time_epoch) - opt_interval + 1
+            helper.log_debug("type of start time: {}".format(type(start_time)))
+            helper.log_debug("***start time***: {}".format(start_time))
             start_time = datetime.datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-        helper.log_info("type of start time: {}".format(type(start_time)))
-        helper.log_info("---start time---: {}".format(start_time))
+        helper.log_debug("type of start time: {}".format(type(start_time)))
+        helper.log_debug("---start time---: {}".format(start_time))
 
         end_time = datetime.datetime.fromtimestamp(
-            int(end_time)).strftime('%m/%d/%Y %H:%M:%S')
-        helper.log_info("start time: {}".format(start_time))
-        helper.log_info("end time: {}".format(end_time))
+            int(end_time_epoch)).strftime('%m/%d/%Y %H:%M:%S')
+        helper.log_debug("start time: {}".format(start_time))
+        helper.log_debug("end time: {}".format(end_time))
         offset = 1
         records = limit
 
         while (records == limit):
-            records = fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
-                                            start_time, end_time, offset, limit, ew, helper, key, password_type, opt_endpoint)
+            helper.log_debug("current_offset: {}".format(offset))
+            records = fetch_webex_logs_live(opt_username, opt_password, opt_site_name,
+                                            start_time, end_time, offset, limit, ew, helper, key, password_type, opt_endpoint, end_time_epoch)
             if records:
                 offset += records
-            #offset = helper.get_check_point(key)
 
-        # Historical Data (offset works)
+    # Historical Data (offset works)
     if opt_live is not True:
+        helper.log_debug("Historical Data")
         for opt_endpoint in opt_endpoints:
-            helper.log_info("[-] \t At {}".format(opt_endpoint))
-            if not opt_start_time_end:
-                opt_start_time_end = "04/10/2050 10:30:34"
+            helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
-            # create checkpoint key
-            #key = helper.get_input_stanza_names() + "_processing"
-            key = helper.get_input_stanza_names() + opt_endpoint + "_processing"
+            opt_start_time_end = "04/10/2050 10:30:34"
 
-            offset = helper.get_check_point(key)
-            if offset is None:
-                offset = 1
+            end_time = datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
+
+            # create checkpoint key for offest and timestamp
+            timestamp_key = "timestamp_{}_{}_processing".format(
+                helper.get_input_stanza_names(), opt_endpoint)
+
+            start_time = helper.get_check_point(timestamp_key)
+            if start_time is None:
+                start_time = opt_start_time_start
             else:
-                offset = int(offset)
+                # shift the starttime by 1 second
+                start_time = datetime.datetime.strptime(
+                    start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+                start_time = int(start_time) + 1
+                start_time = datetime.datetime.fromtimestamp(
+                    int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
+
+            offset = 1
             records = limit
-            while(records == limit):
-                records = fetch_webex_logs(opt_username, opt_password, opt_site_nmae,
-                                           opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, key, password_type, opt_endpoint)
-                """
+            maxStack.empty()
+
+            helper.log_debug("start time: {}".format(start_time))
+            helper.log_debug("end time: {}".format(end_time))
+            while (records == limit):
+                helper.log_debug("Go to fetch")
+                helper.log_debug("current_offset: {}".format(offset))
+                records = fetch_webex_logs(opt_username, opt_password, opt_site_name,
+                                           start_time, end_time, offset, limit, ew, helper, password_type, opt_endpoint, timestamp_key)
+                helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
+                    offset, limit, records))
                 if records:
-                    offset = offset + records
-                """
-                offset = helper.get_check_point(key)
-                helper.log_info("***offset***: {}".format(offset))
+                    offset += records
 
 
-def fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
-                          opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, key, password_type, opt_endpoint):
+def fetch_webex_logs_live(opt_username, opt_password, opt_site_name,
+                          opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, key, password_type, opt_endpoint, end_time_epoch):
 
-    url = "https://{}.webex.com/WBXService/XMLService".format(opt_site_nmae)
+    url = "https://{}.webex.com/WBXService/XMLService".format(opt_site_name)
 
     headers = {
         'Content-Type': 'application/xml'
     }
 
-    timezone = 4  # "4": "GMT-08:00, Pacific",
-
     # Build Payload
-    payload = xml_format(opt_username, opt_password, opt_site_nmae,
+    payload = xml_format(opt_username, opt_password, opt_site_name,
                          opt_start_time_start, opt_start_time_end, offset, limit, password_type, opt_endpoint, helper, timezone)
 
     # debug_index(payload, ew, helper, opt_endpoint)
     # REMOTE THIS LATER
-    helper.log_info("[-] Debug Fetch Request: {} - {}".format(offset, limit))
+    helper.log_debug("[-] Debug Fetch Request: {} - {}".format(offset, limit))
 
-    key_dummy = "dummy"
     try:
         response = requests.request("POST", url, headers=headers, data=payload)
         if response.status_code != 200:
@@ -209,11 +239,7 @@ def fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
                 "\t[-] WebEx Meetings API Error: {}".format(response.text))
 
         events = response.text
-        # helper.log_info(events)
         ev = parse_xml_to_dict(events)
-        helper.log_info(type(ev))
-        helper.log_info("ev")
-        helper.log_info(ev)
         records = 0
 
         ev = ev['message']
@@ -225,13 +251,28 @@ def fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
 
                 if isinstance(conferences, list):
                     for event in conferences:
-                        # if "sessionKey" in event:
-                        dump_it_in_index(event, ew, helper,
-                                         opt_endpoint, key_dummy)
+                        returned_time = datetime.datetime.strptime(
+                            event['startTime'], '%m/%d/%Y %H:%M:%S').strftime("%s")
+                        helper.log_debug(
+                            "\t\t\t[-] {}>{}  ?".format(end_time_epoch, returned_time))
+
+                        if end_time_epoch >= returned_time:  # Checking if the event started early
+                            dump_it_in_index(event, ew, helper, opt_endpoint)
+                        else:
+                            helper.log_debug(
+                                "\t\t\t[-] Skipped an event. {} ".format(event))
+
                 else:
-                    # if "sessionKey" in conferences:
-                    dump_it_in_index(conferences, ew, helper,
-                                     opt_endpoint, key_dummy)
+                    returned_time = datetime.datetime.strptime(
+                        conferences['startTime'], '%m/%d/%Y %H:%M:%S').strftime("%s")
+                    helper.log_debug(
+                        "\t\t\t[-] {}>{}  ?".format(end_time_epoch, returned_time))
+                    if end_time_epoch >= returned_time:  # Checking if the event started early
+                        dump_it_in_index(conferences, ew, helper,
+                                         opt_endpoint)
+                    else:
+                        helper.log_debug(
+                            "\t\t\t[-] Skipped an event. {} ".format(conferences))
                 # Save last end_time
                 helper.save_check_point(key, opt_start_time_end)
 
@@ -239,14 +280,9 @@ def fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
                 matchingRecords = ev["body"]["bodyContent"]['matchingRecords']
                 if "returned" in matchingRecords:
                     records = int(matchingRecords['returned'])
-                    """
-                    if records < limit:
-                        # Last Page - Save Offset
-                        helper.save_check_point(key, offset + records)
-                    """
                     return records
                 else:
-                    helper.log_info(
+                    helper.log_debug(
                         "[-] WebEx Empty records: {}".format(repr(records)))
             elif "no record found" in ev["header"]["response"]["reason"]:
                 return 0
@@ -258,30 +294,25 @@ def fetch_webex_logs_live(opt_username, opt_password, opt_site_nmae,
 
     except Exception as e:
         helper.save_check_point(key, opt_start_time_start)
-        # helper.save_check_point("failed_{}".format(key), "retry")
         helper.log_info(
             "[-] WebEx Request Failed (Check URL and Given Error): {}".format(repr(e)))
         raise e
 
 
-def fetch_webex_logs(opt_username, opt_password, opt_site_nmae,
-                     opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, key, password_type, opt_endpoint):
-
-    url = "https://{}.webex.com/WBXService/XMLService".format(opt_site_nmae)
+def fetch_webex_logs(opt_username, opt_password, opt_site_name,
+                     opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, password_type, opt_endpoint, timestamp_key):
+    helper.log_debug("== Historcial Data log ==")
+    url = "https://{}.webex.com/WBXService/XMLService".format(opt_site_name)
 
     headers = {
         'Content-Type': 'application/xml'
     }
 
-    timezone = 21  # "21": "GMT+00:00, GMT (London)",
-
     # Build Payload
-    payload = xml_format(opt_username, opt_password, opt_site_nmae,
+    payload = xml_format(opt_username, opt_password, opt_site_name,
                          opt_start_time_start, opt_start_time_end, offset, limit, password_type, opt_endpoint, helper, timezone)
 
-    # debug_index(payload, ew, helper, opt_endpoint)
-    # REMOTE THIS LATER
-    helper.log_info("[-] Debug Fetch Request: {} - {}".format(offset, limit))
+    helper.log_debug("[-] Debug Fetch Request: {} - {}".format(offset, limit))
 
     try:
         response = requests.request("POST", url, headers=headers, data=payload)
@@ -290,47 +321,41 @@ def fetch_webex_logs(opt_username, opt_password, opt_site_nmae,
                 "\t[-] WebEx Meetings API Error: {}".format(response.text))
 
         events = response.text
-        # helper.log_info(events)
         ev = parse_xml_to_dict(events)
-        helper.log_info(type(ev))
-        helper.log_info("ev")
-        helper.log_info(ev)
         records = 0
 
         ev = ev['message']
-
         response_key = tag_map[opt_endpoint]
+
         if "header" in ev:
             if "SUCCESS" in ev["header"]["response"]["result"]:
                 conferences = ev["body"]["bodyContent"][response_key]
-
+                helper.log_debug("Start to dump data")
                 if isinstance(conferences, list):
                     for event in conferences:
-                        # if "sessionKey" in event:
-                        dump_it_in_index(event, ew, helper,
-                                         opt_endpoint, key)
+                        dump_historical_data_in_index(event, ew, helper,
+                                                      opt_endpoint, timestamp_key)
                 else:
-                    # if "sessionKey" in conferences:
-                    dump_it_in_index(conferences, ew, helper,
-                                     opt_endpoint, key)
+                    dump_historical_data_in_index(conferences, ew, helper,
+                                                  opt_endpoint, timestamp_key)
 
                 # Record Meta Data
                 matchingRecords = ev["body"]["bodyContent"]['matchingRecords']
                 if "returned" in matchingRecords:
                     records = int(matchingRecords['returned'])
-                    """
-                    if records < limit:
-                        # Last Page - Save Offset
-                        helper.save_check_point(key, offset + records)
-                    """
+                    helper.log_debug(
+                        "[-] Returned Records: {}".format(repr(records)))
                     return records
                 else:
-                    helper.log_info(
+                    helper.log_debug(
                         "[-] WebEx Empty records: {}".format(repr(records)))
             elif "no record found" in ev["header"]["response"]["reason"]:
+                helper.log_debug("[-] WebEx Empty records: 0")
+                helper.log_debug(
+                    "[-] WebEx Response: {}".format(repr(ev["header"]["response"]["reason"])))
                 return 0
             else:
-                helper.log_info(
+                helper.log_debug(
                     "[-] WebEx Response: {}".format(repr(ev["header"]["response"]["reason"])))
         else:
             helper.log_info("Condition not match for : {}".format(repr(ev)))
@@ -341,43 +366,66 @@ def fetch_webex_logs(opt_username, opt_password, opt_site_nmae,
         raise e
 
 
+"""
 def debug_index(event, ew, helper, opt_endpoint):
     if DEBUG_WRITEEV:
         dump_it_in_index(event, ew, helper, opt_endpoint)
+"""
 
 
-def dump_it_in_index(event, ew, helper, opt_endpoint, key):
-    '''
-    event["SessionID"] = event["confID"]
-    event["Attended"] = event["totalParticipants"]
-    event["SessionNo"] = event["sessionKey"]
-    event["MeetingType"] = event["meetingType"]
-    event["Duration"] = event["duration"]
-    event["Topic"] = event["confName"]
-    event["Date"] = event["meetingStartTime"][:10]
-    '''
-
+def dump_it_in_index(event, ew, helper, opt_endpoint):
     if isinstance(event, dict):
+        event = json.dumps(event)
+
+    try:
+        ev = helper.new_event(event, time=None, host=None,
+                              index=None, source=None, sourcetype=sourcetype_map[opt_endpoint], done=True, unbroken=True)
+        ew.write_event(ev)
+    except Exception as e:
+        helper.log_info("[-] WebEx Meetings Event Exception {}".format(e))
+
+
+def dump_historical_data_in_index(event, ew, helper, opt_endpoint, timestamp_key):
+    if isinstance(event, dict):
+        time_tag = timestamp_map[opt_endpoint]
+        this_event_time = event[time_tag]
         event = json.dumps(event)
     try:
         ev = helper.new_event(event, time=None, host=None,
                               index=None, source=None, sourcetype=sourcetype_map[opt_endpoint], done=True, unbroken=True)
         ew.write_event(ev)
 
-        # update the checkpoint for offset
-        offset = helper.get_check_point(key)
-        helper.log_info("offset: {}".format(offset))
-        # set up the offset for the first time
-        if offset is None:
-            offset = 1
-        helper.save_check_point(key, offset + 1)
+        # update the checkpoint for timestamp
+        timestamp = helper.get_check_point(timestamp_key)
+
+        # convert to epoch time
+        if timestamp is None:
+            timestamp = this_event_time
+            helper.save_check_point(timestamp_key, timestamp)
+            #helper.log_info("timestamp: {}".format(timestamp))
+        else:
+            timestamp = datetime.datetime.strptime(
+                timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            this_event_time = datetime.datetime.strptime(
+                this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            maxStack.push(int(this_event_time))
+            current_max_time = maxStack.peekMax()
+            helper.log_debug(
+                "\t [-] Size of stack: {}".format(maxStack.size()))
+            helper.log_debug(
+                "\t [-] Time: this_event_time: {}".format(this_event_time))
+            helper.log_debug(
+                "\t [-] Time: current_max_time: {}".format(current_max_time))
+            timestamp = max(int(timestamp), current_max_time)
+            helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
+            helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
+                int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))
 
     except Exception as e:
-        helper.log_debug("[-] WebEx Meetings Event Exception {}".format(e))
+        helper.log_info("[-] WebEx Meetings Event Exception {}".format(e))
+
 
 # ETREE to dict
-
-
 def etree_to_dict(t):
     d = {t.tag: {} if t.attrib else None}
     children = list(t)
@@ -406,12 +454,7 @@ def parse_xml_to_dict(xml_string):
         if has_namespace:
             el.tag = postfix  # strip all namespaces
     root = it.root
-    # ev = XmlDictConfig(root)
-
-    # e = ETree.XML(root)
-    # ev = etree_to_dict(e)
-    ev = etree_to_dict(root)
-    return ev
+    return etree_to_dict(root)
 
 
 def xml_format(username, password, site_name, start_time_start, start_time_end, offset, limit, password_type, endpoint, helper, timezone):

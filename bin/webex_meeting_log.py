@@ -59,19 +59,15 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
                                          required_on_create=True,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("live", title="Continuous Monitoring",
-                                         description="Use is when not retrieving historical endpoints",
+                                         description="Use this when not retrieving historical endpoints",
                                          required_on_create=False,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("endpoint", title="Historical Endpoints",
-                                         description="Please choose the historical endpoints that are used to fetch data back.",
+                                         description="Please choose the historical endpoints that are used to fetch data back. Note: Please specify a Begin Time below and do not check the Continuous Monitoring when retrieving historical data.",
                                          required_on_create=False,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
-                                         description="This is the time from where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
-                                         required_on_create=False,
-                                         required_on_edit=False))
-        scheme.add_argument(smi.Argument("start_time_end", title="End Time",
-                                         description="This is the time to where you want to ingest the data.  Format: MM/DD/YYYY hh:mm:ss",
+                                         description="This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss",
                                          required_on_create=False,
                                          required_on_edit=False))
         return scheme
