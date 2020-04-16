@@ -24,9 +24,10 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
   - **Site Name** (_required_): This identifies the Webex site you are targeting with your add-on. For example, if the URL is `https://splunk.webex.com`, the Webex Site that you have to enter is `splunk`.
   - **Username** (_required_): E-mail address of the host or admin account making the request. For example: `splunker@splunk.com`.
   - **Password** (_required_): Password of the account associated with the e-mail address above. The password will be masked.
-  - **Endpoints** (_required_): You can choose multiple endpoints that are used to fetch data back.
-  - **Begin Time** (_required_): This is the timeframe starting from where you want to ingest the data. Format for the Start Time would be `MM/DD/YYYY hh:mm:ss`.
-  - **End Time** (_optional_): This is the timeframe until you want to ingest the data . Format for the End Time would be `MM/DD/YYYY hh:mm:ss`.
+  - **Continuous Monitoring**: Check this when retrieving data from Live Endpoint. Note: Pleae leave Historical Endpoints and Begin Time as blank 
+  - **Historical Endpoints** : Use this when retrieving data from Historical Endpoints. Note: Please specify a Begin Time below and do not check the Continuous Monitoring checkbox.
+  - **Begin Time** (_required_): This is the timeframe starting from where you want to ingest the data. Please enter UTC time. Format for the Start Time would be `MM/DD/YYYY hh:mm:ss`.
+
 5. Click on the `Add` green button on the bottom right of the pop up box.
 6. Please check for any errors and resolve them before using the search app to check for the pulled-in data.
 
