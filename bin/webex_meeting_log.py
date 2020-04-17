@@ -54,8 +54,12 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
                                          description="Email address of the host or admin account making a request.",
                                          required_on_create=True,
                                          required_on_edit=False))
+        scheme.add_argument(smi.Argument("password_type", title="Authentication Method",
+                                         description="Choose the Authentication method",
+                                         required_on_create=True,
+                                         required_on_edit=False))
         scheme.add_argument(smi.Argument("password", title="Password",
-                                         description="The login password associated with the Email.",
+                                         description="Password Or  Access Token Or SessionTicket",
                                          required_on_create=True,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("live", title="Continuous Monitoring",

@@ -104,6 +104,9 @@ def collect_events(helper, ew):
     opt_interval = int(helper.get_arg('interval'))
     # opt_timezone = helper.get_arg('timezone')
     opt_live = helper.get_arg('live')
+    password_type = helper.get_arg('password_type')
+
+    helper.log_info("[-] WebEx password_type: {}".format(password_type))
 
     helper.log_info("[-] WebEx API Endpoint: {}".format(opt_endpoints))
     helper.log_info("[-] WebEx interval: {}".format(opt_interval))
@@ -117,7 +120,7 @@ def collect_events(helper, ew):
 
     password_type = helper.get_arg('password_type')
     '''
-    password_type = "password"
+    # password_type = "password"
 
     # ## Feature: partner ID
     '''
@@ -301,7 +304,7 @@ def fetch_webex_logs_live(opt_username, opt_password, opt_site_name,
 
 def fetch_webex_logs(opt_username, opt_password, opt_site_name,
                      opt_start_time_start, opt_start_time_end, offset, limit, ew, helper, password_type, opt_endpoint, timestamp_key):
-    helper.log_debug("== Historcial Data log ==")
+    helper.log_info("== Historcial Data log ==")
     url = "https://{}.webex.com/WBXService/XMLService".format(opt_site_name)
 
     headers = {
@@ -312,12 +315,15 @@ def fetch_webex_logs(opt_username, opt_password, opt_site_name,
     payload = xml_format(opt_username, opt_password, opt_site_name,
                          opt_start_time_start, opt_start_time_end, offset, limit, password_type, opt_endpoint, helper, timezone)
 
-    helper.log_debug("[-] Debug Fetch Request: {} - {}".format(offset, limit))
+    helper.log_info("[-] Debug Payload: {}".format(payload))
+    helper.log_info("[-] Debug Fetch Request: {} - {}".format(offset, limit))
 
     try:
         response = requests.request("POST", url, headers=headers, data=payload)
+        helper.log_info(
+            "[-] : response.status_code: {}".format(response.status_code))
         if response.status_code != 200:
-            helper.log_debug(
+            helper.log_info(
                 "\t[-] WebEx Meetings API Error: {}".format(response.text))
 
         events = response.text
@@ -326,11 +332,12 @@ def fetch_webex_logs(opt_username, opt_password, opt_site_name,
 
         ev = ev['message']
         response_key = tag_map[opt_endpoint]
+        helper.log_info(ev)
 
         if "header" in ev:
             if "SUCCESS" in ev["header"]["response"]["result"]:
                 conferences = ev["body"]["bodyContent"][response_key]
-                helper.log_debug("Start to dump data")
+                helper.log_info("Start to dump data")
                 if isinstance(conferences, list):
                     for event in conferences:
                         dump_historical_data_in_index(event, ew, helper,

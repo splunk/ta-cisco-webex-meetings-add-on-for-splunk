@@ -54,6 +54,13 @@ fields = [
         )
     ), 
     field.RestField(
+        'password_type',
+        required=True,
+        encrypted=False,
+        default=None,
+        validator=None
+    ), 
+    field.RestField(
         'password',
         required=True,
         encrypted=True,

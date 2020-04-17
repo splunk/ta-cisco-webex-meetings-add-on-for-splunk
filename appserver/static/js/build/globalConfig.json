@@ -98,6 +98,10 @@
                         "label": "Username"
                     },
                     {
+                        "field": "password_type",
+                        "label": "Authentication Method"
+                    },
+                    {
                         "field": "password",
                         "label": "Password"
                     },
@@ -217,9 +221,33 @@
                             }
                         },
                         {
+                            "field": "password_type",
+                            "label": "Authentication Method",
+                            "help": "Choose the Authentication method ",
+                            "required": true,
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [
+                                    {
+                                        "value": "password",
+                                        "label": "Basic Password Auth"
+                                    },
+                                    {
+                                        "value": "webExAccessToken",
+                                        "label": "OAuth (alpha/test)"
+                                    },
+                                    {
+                                        "value": "sessionTicket",
+                                        "label": "SAML Ticket (alpha/test)"
+                                    }
+                                ]
+                            }
+                        },
+                        {
                             "field": "password",
                             "label": "Password",
-                            "help": "The login password associated with the Email.",
+                            "help": "Password Or  Access Token Or SessionTicket",
                             "required": true,
                             "type": "text",
                             "encrypted": true,
