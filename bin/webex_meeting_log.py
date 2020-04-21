@@ -46,7 +46,7 @@ class ModInputwebex_meeting_log(modinput_wrapper.base_modinput.BaseModInput):
         For customized inputs, hard code the arguments here to hide argument detail from users.
         For other input types, arguments should be get from input_module. Defining new input types could be easier.
         """
-        scheme.add_argument(smi.Argument("site_nmae", title="Site Name",
+        scheme.add_argument(smi.Argument("site_name", title="Site Name",
                                          description="This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://meetingsamer.webex.com specify meetingsamer",
                                          required_on_create=True,
                                          required_on_edit=False))

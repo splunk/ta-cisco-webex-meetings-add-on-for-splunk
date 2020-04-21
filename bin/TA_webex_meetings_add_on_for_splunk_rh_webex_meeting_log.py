@@ -34,7 +34,7 @@ fields = [
         )
     ), 
     field.RestField(
-        'site_nmae',
+        'site_name',
         required=True,
         encrypted=False,
         default=None,

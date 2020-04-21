@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-webex-meetings-add-on-for-splunk",
         "displayName": "WebEx Meetings Add-on for Splunk",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "apiVersion": "3.0.0",
         "restRoot": "TA_webex_meetings_add_on_for_splunk"
     },
@@ -90,7 +90,7 @@
                         "label": "Status"
                     },
                     {
-                        "field": "site_nmae",
+                        "field": "site_name",
                         "label": "Site Name"
                     },
                     {
@@ -185,7 +185,7 @@
                             ]
                         },
                         {
-                            "field": "site_nmae",
+                            "field": "site_name",
                             "label": "Site Name",
                             "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://meetingsamer.webex.com specify meetingsamer",
                             "required": true,
@@ -295,6 +295,10 @@
                                     {
                                         "value": "LstrecordaccessHistory",
                                         "label": "Recorded Access History"
+                                    },
+                                    {
+                                        "value": "LstmeetingattendeeHistory",
+                                        "label": "Meeting Attendee History"
                                     }
                                 ]
                             }
