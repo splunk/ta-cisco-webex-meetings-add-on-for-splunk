@@ -196,6 +196,7 @@ def collect_events(helper, ew):
             start_time = helper.get_check_point(timestamp_key)
             if start_time is None:
                 start_time = opt_start_time_start
+                helper.save_check_point(timestamp_key, start_time)
             else:
                 # shift the starttime by 1 second
                 start_time = datetime.datetime.strptime(
