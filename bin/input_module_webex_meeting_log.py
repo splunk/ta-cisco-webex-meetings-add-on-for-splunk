@@ -12,7 +12,7 @@ from collections import defaultdict
 from xml.etree import cElementTree as ETree
 import json
 
-from MaxStack_list import MaxStack_list
+#from MaxStack_list import MaxStack_list
 from xml_payload_format import xml_format
 
 tag_map = {
@@ -49,7 +49,7 @@ timestamp_map = {
     "LstsummaryMeeting": "startDate",
     "LstsummarySession": "startTime"
 }
-maxStack = MaxStack_list()
+#maxStack = MaxStack_list()
 
 
 '''
@@ -111,7 +111,7 @@ def collect_events(helper, ew):
     params = {"opt_username": helper.get_arg('username'),
               "opt_password": helper.get_arg('password'),
               "opt_site_name": helper.get_arg('site_name'),
-              "limit": 1000,
+              "limit": 10,
               "timezone": "20",
               "password_type": helper.get_arg('password_type')}
 
@@ -127,6 +127,17 @@ def collect_events(helper, ew):
 
         timestamp_key = "timestamp_{}_{}_processing".format(
             helper.get_input_stanza_names(), params['opt_endpoint'])
+
+        # Get previously ingested confID
+
+        params['confID_key'] = "confID_{}_{}_processing".format(
+            helper.get_input_stanza_names(), params['opt_endpoint'])
+        confID_keys = helper.get_check_point(params['confID_key'])
+        if confID_keys:
+            params['confID_keys'] = json.loads(confID_keys)
+        else:
+            params['confID_keys'] = json.loads('[]')
+
         start_time = helper.get_check_point(timestamp_key)
         if start_time:
             start_time = datetime.datetime.strptime(
@@ -193,7 +204,7 @@ def collect_events(helper, ew):
                 start_time = datetime.datetime.fromtimestamp(
                     int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-            maxStack.empty()
+            # maxStack.empty()
 
             helper.log_debug("Start time: {}".format(start_time))
             helper.log_debug("End time: {}".format(end_time))
@@ -267,14 +278,14 @@ def fetch_webex_logs(ew, helper, params):
 
                             if end_time_epoch >= returned_time:  # Checking if the event started early
                                 dump_in_index(event, ew, helper,
-                                              params['opt_endpoint'], params['timestamp_key'])
+                                              params['opt_endpoint'], params['timestamp_key'], params)
                             else:
                                 helper.log_debug(
                                     "\t\t\t[-] Skipped an event. {} ".format(event))
                         else:
                             # Historical
                             dump_in_index(event, ew, helper,
-                                          params['opt_endpoint'], params['timestamp_key'])
+                                          params['opt_endpoint'], params['timestamp_key'], params)
                 else:
                     if mode is "live":
                         # live
@@ -284,14 +295,14 @@ def fetch_webex_logs(ew, helper, params):
                             "\t\t\t[-] {}>{}  ?".format(end_time_epoch, returned_time))
                         if end_time_epoch >= returned_time:  # Checking if the event started early
                             dump_in_index(conferences, ew, helper,
-                                          params['opt_endpoint'], params['timestamp_key'])
+                                          params['opt_endpoint'], params['timestamp_key'], params)
                         else:
                             helper.log_debug(
                                 "\t\t\t[-] Skipped an event. {} ".format(conferences))
                     else:
                         # Historical
                         dump_in_index(conferences, ew, helper,
-                                      params['opt_endpoint'], params['timestamp_key'])
+                                      params['opt_endpoint'], params['timestamp_key'], params)
 
                 # Record Meta Data
                 matchingRecords = ev["body"]["bodyContent"]['matchingRecords']
@@ -320,42 +331,57 @@ def fetch_webex_logs(ew, helper, params):
         raise e
 
 
-def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key):
+def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
     if isinstance(event, dict):
         time_tag = timestamp_map[opt_endpoint]
         this_event_time = event[time_tag]
-        event = json.dumps(event)
+
+        if params['mode'] is "live":
+            this_event_confID = event["confID"]
+
+            helper.log_info("\t confID_key: {}".format(params['confID_key']))
+            helper.log_info("\t confID_keys: {}".format(params['confID_keys']))
+            if this_event_confID in params['confID_keys']:
+                helper.log_info("\t old event: PASS")
+                return
+            else:
+                helper.log_info("\t old event: new event")
+                helper.save_check_point(
+                    params['confID_key'], json.dumps(params['confID_keys']))
+
     try:
         this_event_time = datetime.datetime.strptime(
             this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
-        ev = helper.new_event(event, time=this_event_time, host=None,
+        ev = helper.new_event(json.dumps(event), time=this_event_time, host=None,
                               index=None, source=None, sourcetype=sourcetype_map[opt_endpoint], done=True, unbroken=True)
         ew.write_event(ev)
 
         # update the checkpoint for timestamp
         timestamp = helper.get_check_point(timestamp_key)
-
+        """
         if timestamp is None:
             timestamp = datetime.datetime.fromtimestamp(
                 int(this_event_time)).strftime('%m/%d/%Y %H:%M:%S')
             helper.save_check_point(timestamp_key, timestamp)
-            # helper.log_info("timestamp: {}".format(timestamp))
-        else:
-            # convert to epoch time to compare
-            timestamp = datetime.datetime.strptime(
-                timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
-            maxStack.push(int(this_event_time))
-            current_max_time = maxStack.peekMax()
-            helper.log_debug(
-                "\t [-] Size of stack: {}".format(maxStack.size()))
-            helper.log_debug(
-                "\t [-] Time: this_event_time: {}".format(this_event_time))
-            helper.log_debug(
-                "\t [-] Time: current_max_time: {}".format(current_max_time))
-            timestamp = max(int(timestamp), current_max_time)
-            helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
-            helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
-                int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))
+        """
+        # helper.log_info("timestamp: {}".format(timestamp))
+        # else:
+        # convert to epoch time to compare
+
+        timestamp = datetime.datetime.strptime(
+            timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        # maxStack.push(int(this_event_time))
+        #current_max_time = maxStack.peekMax()
+        # helper.log_debug(
+        # "\t [-] Size of stack: {}".format(maxStack.size()))
+        # helper.log_debug(
+        # "\t [-] Time: this_event_time: {}".format(this_event_time))
+        # helper.log_debug(
+        # "\t [-] Time: current_max_time: {}".format(current_max_time))
+        timestamp = max(int(timestamp), int(this_event_time))
+        helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
+        helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
+            int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))
 
     except Exception as e:
         helper.log_info("[-] WebEx Meetings Event Exception {}".format(e))
