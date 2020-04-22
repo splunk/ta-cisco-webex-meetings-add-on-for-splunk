@@ -237,7 +237,6 @@ def fetch_webex_logs(ew, helper, params):
     # Build Payload
     payload = xml_format(params)
 
-    helper.log_debug("[-] Debug Payload: {}".format(payload))
     helper.log_debug(
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
 
