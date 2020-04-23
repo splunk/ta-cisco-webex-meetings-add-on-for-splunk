@@ -13,7 +13,7 @@ These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-g
 - LstsummarySession
 
 #### Installation and Configuration Steps
-This application can be installed on-prem and cloud. The TA can be downloaded from the [JIRA ticket](https://jira.splunk.com/browse/FDSE-612) / [Drive link](https://drive.google.com).
+This application can be installed on-prem and cloud. 
 
 ##### Installation Steps for `on-prem`
 Install the TA on one of the Heavy Forwarder(s).
