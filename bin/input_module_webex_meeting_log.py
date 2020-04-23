@@ -11,6 +11,7 @@ from io import StringIO
 from collections import defaultdict
 from xml.etree import cElementTree as ETree
 import json
+from datetime import date, timedelta
 
 #from MaxStack_list import MaxStack_list
 from xml_payload_format import xml_format
@@ -35,9 +36,19 @@ sourcetype_map = {
     "LstsummarySession": "cisco:webex:session:list"
 }
 
-# use this for timestamp checkpoint
-# remove it if offset work
+# End time tag map: use this for timestamp checkpoint
 timestamp_map = {
+    "LstmeetingattendeeHistory": "leaveTime",
+    "LstmeetingusageHistory": "meetingEndTime",
+    "LsteventsessionHistory": "sessionEndTime",
+    "LstrecordaccessHistory": "creationTime",
+    "LstsupportsessionHistory": "sessionEndTime",
+    "LsttrainingsessionHistory": "sessionEndTime",
+    "LstsummarySession": "actualStartTime"
+}
+
+# Start time tag map: use this for time extration
+start_time_map = {
     "LstmeetingattendeeHistory": "joinTime",
     "LstmeetingusageHistory": "meetingStartTime",
     "LsteventsessionHistory": "sessionStartTime",
@@ -74,20 +85,18 @@ def validate_input(helper, definition):
     start_time_end = definition.parameters.get('start_time_end', None)
     live = definition.parameters.get('live', None)
     interval = definition.parameters.get('interval', None)
-    
 
     if live == "1" and start_time_start:
         raise ValueError(
             "Start time is not required for Continuous Monitoring.")
-            
+
     if live == "1" and int(interval) > 60:
         raise ValueError(
             "Interval should be 60 or less for session data, not {}.".format(interval))
-            
+
     if live == "0" and int(interval) < 172800:
         raise ValueError(
             "Interval should be 172800 or more for historical data, not {}.".format(interval))
-            
 
     try:
         # if not live:
@@ -191,13 +200,17 @@ def collect_events(helper, ew):
             if records:
                 offset += records
 
-    # Historical Data (offset works)
+    # Historical Data
     if opt_live is not True:
         helper.log_debug("Historical Data")
         for opt_endpoint in opt_endpoints:
             helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
-            end_time = datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
+            # endtime is midnight of GMT - 3days
+            # end_time = datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
+            enddt = datetime.datetime.utcnow().date() - timedelta(3)
+            end_time = datetime.datetime.combine(
+                enddt, datetime.datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
 
             # create checkpoint key for offest and timestamp
             timestamp_key = "timestamp_{}_{}_processing".format(
@@ -328,13 +341,20 @@ def fetch_webex_logs(ew, helper, params):
 
 def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
     if isinstance(event, dict):
-        time_tag = timestamp_map[opt_endpoint]
+        # get the end time of this event
         helper.log_info("Event Returned: {}".format(event))
-        this_event_time = event[time_tag]
+        this_event_end_time = event[timestamp_map[opt_endpoint]]
+
+        # get start time of this event
+        this_event_start_time = event[start_time_map[opt_endpoint]]
+        helper.log_debug(
+            "\t Event start time: {}".format(this_event_start_time))
+        this_event_start_time = datetime.datetime.strptime(
+            this_event_start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
 
     try:
-        this_event_time = datetime.datetime.strptime(
-            this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        this_event_end_time = datetime.datetime.strptime(
+            this_event_end_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
 
         # Prevent Duplicates in Session Mode
         if params['mode'] == "live":
@@ -342,12 +362,12 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
                 params['start_time'], '%m/%d/%Y %H:%M:%S').strftime("%s")
             # actualStartTime is this_event_time
             helper.log_debug(
-                "\t\t\t [--] {} < {}".format(this_event_time, start_time))
-            if this_event_time < start_time:
+                "\t\t\t [--] {} < {}".format(this_event_end_time, start_time))
+            if int(this_event_end_time) < int(start_time):
                 helper.log_debug("\t\t\t [--] RETURN - Duplicate")
                 return
 
-        ev = helper.new_event(json.dumps(event), time=this_event_time, host=None,
+        ev = helper.new_event(json.dumps(event), time="%.3f" % int(this_event_start_time), host=None,
                               index=None, source=None, sourcetype=sourcetype_map[opt_endpoint], done=True, unbroken=True)
         ew.write_event(ev)
 
@@ -355,7 +375,7 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
         timestamp = helper.get_check_point(timestamp_key)
         timestamp = datetime.datetime.strptime(
             timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
-        timestamp = max(int(timestamp), int(this_event_time))
+        timestamp = max(int(timestamp), int(this_event_end_time))
         helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
         helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
             int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))

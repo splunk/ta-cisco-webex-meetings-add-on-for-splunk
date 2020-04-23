@@ -4,8 +4,8 @@ def xml_format(params):
     username = params['opt_username']
     password = params['opt_password']
     site_name = params['opt_site_name']
-    start_time_start = params['start_time']
-    start_time_end = params['end_time']
+    start_time = params['start_time']
+    end_time = params['end_time']
     offset = params['offset']
     limit = params['limit']
     password_type = params['password_type']
@@ -28,35 +28,35 @@ def xml_format(params):
             </order>
         '''
     # Endpooint specific Payload
-    startTimeScope = ""
+    TimeScope = ""
     if endpoint == "LstmeetingusageHistory" or endpoint == "LstsupportsessionHistory" or endpoint == "LsttrainingsessionHistory" or endpoint == "LsteventsessionHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
 
-        startTimeScope = '''
-                        <startTimeScope>
-                            <sessionStartTimeStart>{start_time_start}</sessionStartTimeStart>
-                            <sessionStartTimeEnd>{start_time_end}</sessionStartTimeEnd>
-                        </startTimeScope>
-        '''.format(start_time_start=start_time_start, start_time_end=start_time_end)
+        TimeScope = '''
+                        <endTimeScope>
+                            <sessionEndTimeStart>{start_time}</sessionEndTimeStart>
+                            <sessionEndTimeEnd>{end_time}</sessionEndTimeEnd>
+                        </endTimeScope>
+        '''.format(start_time=start_time, end_time=end_time)
     elif endpoint == "LstmeetingattendeeHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
-        startTimeScope = '''
-                        <startTimeScope>
-                            <sessionStartTimeStart>{start_time_start}</sessionStartTimeStart>
-                            <sessionStartTimeEnd>{start_time_end}</sessionStartTimeEnd>
-                        </startTimeScope>
-        '''.format(start_time_start=start_time_start, start_time_end=start_time_end)
+        TimeScope = '''
+                        <endTimeScope>
+                            <sessionEndTimeStart>{start_time}</sessionEndTimeStart>
+                            <sessionEndTimeEnd>{end_time}</sessionEndTimeEnd>
+                        </endTimeScope>
+        '''.format(start_time=start_time, end_time=end_time)
     elif endpoint == "LstrecordaccessHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
-        startTimeScope = '''
+        TimeScope = '''
                         <viewTimeScope>
-                            <viewTimeStart>{start_time_start}</viewTimeStart>
-                            <viewTimeEnd>{start_time_end}</viewTimeEnd>
+                            <viewTimeStart>{start_time}</viewTimeStart>
+                            <viewTimeEnd>{end_time}</viewTimeEnd>
                         </viewTimeScope>
-        '''.format(start_time_start=start_time_start, start_time_end=start_time_end)
+        '''.format(start_time=start_time, end_time=end_time)
         order = '''
             <order>
                 <orderBy>RECORDID</orderBy>
@@ -66,19 +66,15 @@ def xml_format(params):
     elif endpoint == "LstsummarySession":
         endpoint = "java:com.webex.service.binding.ep.{}".format(
             endpoint)
-        startTimeScope = '''
+        TimeScope = '''
                     <dateScope>
-                        <startDateStart>{start_time_start}</startDateStart>
-                        <startDateEnd>{start_time_end}</startDateEnd>
+                        <startDateStart>{start_time}</startDateStart>
+                        <startDateEnd>{end_time}</startDateEnd>
                         <timeZoneID>{timezone}</timeZoneID>
                     </dateScope>
-        '''.format(start_time_start=start_time_start, start_time_end=start_time_end, timezone=timezone)
-    elif endpoint == "LstsummaryMeeting":
-        endpoint = "java:com.webex.service.binding.meeting.{}".format(
-            endpoint)
-        startTimeScope = ""
+        '''.format(start_time=start_time, end_time=end_time, timezone=timezone)
     else:
-        startTimeScope = ""
+        TimeScope = ""
 
     # Final Payload
     payload = """<?xml version="1.0" encoding="UTF-8"?>
@@ -86,7 +82,7 @@ def xml_format(params):
         <header>{auth}</header>
         <body>
             <bodyContent xsi:type="{endpoint}">
-                {startTimeScope}
+                {TimeScope}
                 <listControl>
                     <startFrom>{offset}</startFrom>
                     <maximumNum>{limit}</maximumNum>
@@ -95,5 +91,5 @@ def xml_format(params):
                 {order}
             </bodyContent>
         </body>
-    </serv:message>""".format(auth=auth, endpoint=endpoint, startTimeScope=startTimeScope, offset=offset, limit=limit, order=order)
+    </serv:message>""".format(auth=auth, endpoint=endpoint, TimeScope=TimeScope, offset=offset, limit=limit, order=order)
     return payload
