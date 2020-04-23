@@ -42,4 +42,4 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 
 
 ## Credits & Acknowledgements (optional)
-> Please feel free to contact fdse@splunk.com or #team-fdse on Slack for any more information.
+> Built by Splunk's FDSE Team (#team-fdse). 
