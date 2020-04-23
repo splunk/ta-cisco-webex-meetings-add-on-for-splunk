@@ -6,15 +6,15 @@
 This is a TA to pull in data from WebEx Meetings XML API. 
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings. 
 
-| XML API                   | Sourcetype                              | Time Field       | Type            | Recommended Interval | Description                                                                                                                                                                              |
-|---------------------------|-----------------------------------------|------------------|-----------------|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| LstmeetingattendeeHistory | cisco:webex:meetingattendeehistory:list | joinTime         | Historical      | >= 86400             | Attendee information for any meeting session previously hosted on the site.                                                                                                              |
-| LstmeetingusageHistory    | cisco:webex:meetingusagehistory:list    | meetingStartTime | Historical      | >= 86400             | Usage data for previously hosted meeting sessions.                                                                                                                                       |
-| LsteventsessionHistory    | cisco:webex:eventsessionhistory:list    | sessionStartTime | Historical      | >= 86400             | Usage data for previously hosted events                                                                                                                                                  |
-| LstrecordaccessHistory    | cisco:webex:recordaccesshistory:list    | creationTime     | Historical      | >= 86400             | Provides the access details for a previously recorded training session.                                                                                                                  |
-| LstsupportsessionHistory  | cisco:webex:supportsessionhistory:list  | sessionStartTime | Historical      | >= 86400             | Usage data for previously hosted support sessions.                                                                                                                                       |
-| LsttrainingsessionHistory | cisco:webex:trainingsessionhistory:list | sessionStartTime | Historical      | >= 86400             | Usage data for previously hosted training sessions                                                                                                                                       |
-| LstsummarySession         | cisco:webex:session:list                | actualStartTime  | Active Sessions | <= 60                | Lists summary information for scheduled sessions containing information for all service types, including Meeting Center, Training Center, Event Center, Sales Center and Support Center. |
+| XML API                   | Sourcetype                              | Time Field       | Type            | Recommended Interval |
+|---------------------------|-----------------------------------------|------------------|-----------------|----------------------|
+| LstmeetingattendeeHistory | cisco:webex:meetingattendeehistory:list | joinTime         | Historical      | >= 86400             |
+| LstmeetingusageHistory    | cisco:webex:meetingusagehistory:list    | meetingStartTime | Historical      | >= 86400             |
+| LsteventsessionHistory    | cisco:webex:eventsessionhistory:list    | sessionStartTime | Historical      | >= 86400             |
+| LstrecordaccessHistory    | cisco:webex:recordaccesshistory:list    | creationTime     | Historical      | >= 86400             |
+| LstsupportsessionHistory  | cisco:webex:supportsessionhistory:list  | sessionStartTime | Historical      | >= 86400             |
+| LsttrainingsessionHistory | cisco:webex:trainingsessionhistory:list | sessionStartTime | Historical      | >= 86400             |
+| LstsummarySession         | cisco:webex:session:list                | actualStartTime  | Active Sessions | <= 60                |
 
 #### Create a Service Account
 
