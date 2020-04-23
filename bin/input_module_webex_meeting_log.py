@@ -22,7 +22,6 @@ tag_map = {
     "LstrecordaccessHistory": "recordAccessHistory",
     "LstsupportsessionHistory": "supportSessionHistory",
     "LsttrainingsessionHistory": "trainingSessionHistory",
-    "LstsummaryMeeting": "meeting",
     "LstsummarySession": "session"
 }
 
@@ -33,7 +32,6 @@ sourcetype_map = {
     "LstrecordaccessHistory": "cisco:webex:recordaccesshistory:list",
     "LstsupportsessionHistory": "cisco:webex:supportsessionhistory:list",
     "LsttrainingsessionHistory": "cisco:webex:trainingsessionhistory:list",
-    "LstsummaryMeeting": "cisco:webex:meeting:list",
     "LstsummarySession": "cisco:webex:session:list"
 }
 
@@ -46,8 +44,7 @@ timestamp_map = {
     "LstrecordaccessHistory": "creationTime",
     "LstsupportsessionHistory": "sessionStartTime",
     "LsttrainingsessionHistory": "sessionStartTime",
-    "LstsummaryMeeting": "startDate",
-    "LstsummarySession": "startTime"
+    "LstsummarySession": "actualStartTime"
 }
 #maxStack = MaxStack_list()
 
@@ -129,7 +126,7 @@ def collect_events(helper, ew):
             helper.get_input_stanza_names(), params['opt_endpoint'])
 
         # Get previously ingested confID
-
+        """
         params['confID_key'] = "confID_{}_{}_processing".format(
             helper.get_input_stanza_names(), params['opt_endpoint'])
         confID_keys = helper.get_check_point(params['confID_key'])
@@ -137,8 +134,10 @@ def collect_events(helper, ew):
             params['confID_keys'] = json.loads(confID_keys)
         else:
             params['confID_keys'] = json.loads('[]')
+        """
 
         start_time = helper.get_check_point(timestamp_key)
+        helper.log_debug("timestamp_value: {}".format(start_time))
         if start_time:
             start_time = datetime.datetime.strptime(
                 start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
@@ -154,6 +153,7 @@ def collect_events(helper, ew):
             helper.log_debug("***start time***: {}".format(start_time))
             start_time = datetime.datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
+            helper.save_check_point(timestamp_key, start_time)
 
         helper.log_debug("type of start time: {}".format(type(start_time)))
         helper.log_debug("---start time---: {}".format(start_time))
@@ -174,7 +174,6 @@ def collect_events(helper, ew):
         offset = 1
         while (records == params['limit']):
             helper.log_debug("current_offset: {}".format(offset))
-            # records = fetch_webex_logs_live(opt_username, opt_password, opt_site_name,  start_time, end_time, offset, limit, ew, helper, key, password_type, opt_endpoint, end_time_epoch)
             params['offset'] = offset
             records = fetch_webex_logs(ew, helper, params)
 
@@ -248,6 +247,7 @@ def fetch_webex_logs(ew, helper, params):
 
     # Build Payload
     payload = xml_format(params)
+    helper.log_debug("payload start time: {}".format(params['start_time']))
 
     helper.log_debug(
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
@@ -271,36 +271,19 @@ def fetch_webex_logs(ew, helper, params):
                 helper.log_debug("Start to dump data")
                 if isinstance(conferences, list):
                     for event in conferences:
-                        if mode is "live":
-                            # live
-                            returned_time = datetime.datetime.strptime(
-                                event['startTime'], '%m/%d/%Y %H:%M:%S').strftime("%s")
-                            # helper.log_debug("\t\t\t[-] {}>{}  ?".format(end_time_epoch, returned_time))
-
-                            if end_time_epoch >= returned_time:  # Checking if the event started early
-                                dump_in_index(event, ew, helper,
-                                              params['opt_endpoint'], params['timestamp_key'], params)
-                            else:
-                                helper.log_debug(
-                                    "\t\t\t[-] Skipped an event. {} ".format(event))
-                        else:
+                        if mode is "live" and "actualStartTime" in event:
+                            dump_in_index(event, ew, helper,
+                                          params['opt_endpoint'], params['timestamp_key'], params)
+                        elif mode is "historical":
                             # Historical
                             dump_in_index(event, ew, helper,
                                           params['opt_endpoint'], params['timestamp_key'], params)
                 else:
-                    if mode is "live":
-                        # live
-                        returned_time = datetime.datetime.strptime(
-                            conferences['startTime'], '%m/%d/%Y %H:%M:%S').strftime("%s")
-                        helper.log_debug(
-                            "\t\t\t[-] {}>{}  ?".format(end_time_epoch, returned_time))
-                        if end_time_epoch >= returned_time:  # Checking if the event started early
-                            dump_in_index(conferences, ew, helper,
-                                          params['opt_endpoint'], params['timestamp_key'], params)
-                        else:
-                            helper.log_debug(
-                                "\t\t\t[-] Skipped an event. {} ".format(conferences))
-                    else:
+                    if mode is "live" and "actualStartTime" in conferences:
+                        dump_in_index(conferences, ew, helper,
+                                      params['opt_endpoint'], params['timestamp_key'], params)
+
+                    elif mode is "historical":
                         # Historical
                         dump_in_index(conferences, ew, helper,
                                       params['opt_endpoint'], params['timestamp_key'], params)
@@ -335,50 +318,32 @@ def fetch_webex_logs(ew, helper, params):
 def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
     if isinstance(event, dict):
         time_tag = timestamp_map[opt_endpoint]
+        helper.log_info("Event Returned: {}".format(event))
         this_event_time = event[time_tag]
-
-        if params['mode'] is "live":
-            this_event_confID = event["confID"]
-
-            helper.log_info("\t confID_key: {}".format(params['confID_key']))
-            helper.log_info("\t confID_keys: {}".format(params['confID_keys']))
-            if this_event_confID in params['confID_keys']:
-                helper.log_info("\t old event: PASS")
-                return
-            else:
-                helper.log_info("\t old event: new event")
-                helper.save_check_point(
-                    params['confID_key'], json.dumps(params['confID_keys']))
 
     try:
         this_event_time = datetime.datetime.strptime(
             this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+
+        # Prevent Duplicates in Session Mode
+        if params['mode'] == "live":
+            start_time = datetime.datetime.strptime(
+                params['start_time'], '%m/%d/%Y %H:%M:%S').strftime("%s")
+            # actualStartTime is this_event_time
+            helper.log_debug(
+                "\t\t\t [--] {} < {}".format(this_event_time, start_time))
+            if this_event_time < start_time:
+                helper.log_debug("\t\t\t [--] RETURN - Duplicate")
+                return
+
         ev = helper.new_event(json.dumps(event), time=this_event_time, host=None,
                               index=None, source=None, sourcetype=sourcetype_map[opt_endpoint], done=True, unbroken=True)
         ew.write_event(ev)
 
         # update the checkpoint for timestamp
         timestamp = helper.get_check_point(timestamp_key)
-        """
-        if timestamp is None:
-            timestamp = datetime.datetime.fromtimestamp(
-                int(this_event_time)).strftime('%m/%d/%Y %H:%M:%S')
-            helper.save_check_point(timestamp_key, timestamp)
-        """
-        # helper.log_info("timestamp: {}".format(timestamp))
-        # else:
-        # convert to epoch time to compare
-
         timestamp = datetime.datetime.strptime(
             timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
-        # maxStack.push(int(this_event_time))
-        #current_max_time = maxStack.peekMax()
-        # helper.log_debug(
-        # "\t [-] Size of stack: {}".format(maxStack.size()))
-        # helper.log_debug(
-        # "\t [-] Time: this_event_time: {}".format(this_event_time))
-        # helper.log_debug(
-        # "\t [-] Time: current_max_time: {}".format(current_max_time))
         timestamp = max(int(timestamp), int(this_event_time))
         helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
         helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
