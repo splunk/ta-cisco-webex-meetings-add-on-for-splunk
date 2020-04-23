@@ -108,7 +108,7 @@ def collect_events(helper, ew):
     params = {"opt_username": helper.get_arg('username'),
               "opt_password": helper.get_arg('password'),
               "opt_site_name": helper.get_arg('site_name'),
-              "limit": 10,
+              "limit": 1000,
               "timezone": "20",
               "password_type": helper.get_arg('password_type')}
 
