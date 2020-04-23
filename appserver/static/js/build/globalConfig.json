@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-webex-meetings-add-on-for-splunk",
         "displayName": "WebEx Meetings Add-on for Splunk",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "apiVersion": "3.0.0",
         "restRoot": "TA_webex_meetings_add_on_for_splunk"
     },
@@ -226,6 +226,7 @@
                             "help": "Choose the Authentication method ",
                             "required": true,
                             "type": "singleSelect",
+                            "defaultValue": "password",
                             "options": {
                                 "disableSearch": true,
                                 "autoCompleteFields": [
