@@ -73,10 +73,21 @@ def validate_input(helper, definition):
     start_time_start = definition.parameters.get('start_time_start', None)
     start_time_end = definition.parameters.get('start_time_end', None)
     live = definition.parameters.get('live', None)
+    interval = definition.parameters.get('interval', None)
+    
 
     if live == "1" and start_time_start:
         raise ValueError(
             "Start time is not required for Continuous Monitoring.")
+            
+    if live == "1" and int(interval) > 60:
+        raise ValueError(
+            "Interval should be 60 or less for session data, not {}.".format(interval))
+            
+    if live == "0" and int(interval) < 172800:
+        raise ValueError(
+            "Interval should be 172800 or more for historical data, not {}.".format(interval))
+            
 
     try:
         # if not live:
@@ -108,7 +119,7 @@ def collect_events(helper, ew):
     params = {"opt_username": helper.get_arg('username'),
               "opt_password": helper.get_arg('password'),
               "opt_site_name": helper.get_arg('site_name'),
-              "limit": 1000,
+              "limit": 500,
               "timezone": "20",
               "password_type": helper.get_arg('password_type')}
 

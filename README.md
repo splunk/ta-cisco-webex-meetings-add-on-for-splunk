@@ -40,6 +40,10 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 ## Example(s)
 <img src="Configuration_Screenshot.png"  width="600" height="450">
 
+## Troubleshooting
+
+**DISCLAIMER:** Guidance from Cisco states historical data retrieval may be incomplete if less than 48 hours from time meetings ended. Therefore it's recommended to set interval to 172800
+
 
 ## Credits & Acknowledgements (optional)
 > Please feel free to contact fdse@splunk.com or #team-fdse on Slack for any more information.
