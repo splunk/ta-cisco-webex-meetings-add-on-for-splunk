@@ -94,9 +94,9 @@ def validate_input(helper, definition):
         raise ValueError(
             "Interval should be 60 or less for session data, not {}.".format(interval))
 
-    if live == "0" and int(interval) < 172800:
+    if live == "0" and int(interval) < 86400:
         raise ValueError(
-            "Interval should be 172800 or more for historical data, not {}.".format(interval))
+            "Interval should be 86400 or more for historical data, not {}.".format(interval))
 
     try:
         # if not live:
