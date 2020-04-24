@@ -16,6 +16,9 @@ These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-g
 | LsttrainingsessionHistory | cisco:webex:trainingsessionhistory:list | sessionStartTime | Historical      | >= 86400             |
 | LstsummarySession         | cisco:webex:session:list                | actualStartTime  | Active Sessions | <= 60                |
 
+
+**DISCLAIMER**: Guidance from Cisco states historical data retrieval may be incomplete if fetched less than 48 hours from time meetings ended. Therefore it's recommended to set the interval to 86400 or more for historical input.
+
 #### Create a Service Account
 
 Create the service account in **Webex Meetings site's admin portal** (CompanyXYZ.webex.com).  Attached is the sample Screenshots.  Once the API user was created it was linked to the Control Hub because we have linked sites.
