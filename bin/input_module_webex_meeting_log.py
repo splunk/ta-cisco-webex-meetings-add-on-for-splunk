@@ -343,7 +343,7 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
     if isinstance(event, dict):
         # get the end time of this event
         helper.log_info("Event Returned: {}".format(event))
-        this_event_end_time = event[timestamp_map[opt_endpoint]]
+        this_event_time = event[timestamp_map[opt_endpoint]]
 
         # get start time of this event
         this_event_start_time = event[start_time_map[opt_endpoint]]
@@ -353,8 +353,8 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
             this_event_start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
 
     try:
-        this_event_end_time = datetime.datetime.strptime(
-            this_event_end_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        this_event_time = datetime.datetime.strptime(
+            this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
 
         # Prevent Duplicates in Session Mode
         if params['mode'] == "live":
@@ -362,8 +362,8 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
                 params['start_time'], '%m/%d/%Y %H:%M:%S').strftime("%s")
             # actualStartTime is this_event_time
             helper.log_debug(
-                "\t\t\t [--] {} < {}".format(this_event_end_time, start_time))
-            if int(this_event_end_time) < int(start_time):
+                "\t\t\t [--] {} < {}".format(this_event_time, start_time))
+            if int(this_event_time) < int(start_time):
                 helper.log_debug("\t\t\t [--] RETURN - Duplicate")
                 return
 
@@ -375,7 +375,7 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
         timestamp = helper.get_check_point(timestamp_key)
         timestamp = datetime.datetime.strptime(
             timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
-        timestamp = max(int(timestamp), int(this_event_end_time))
+        timestamp = max(int(timestamp), int(this_event_time))
         helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
         helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
             int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))
