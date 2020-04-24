@@ -6,15 +6,15 @@
 This is a TA to pull in data from WebEx Meetings XML API. 
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings. 
 
-| XML API                   | Sourcetype                              | Time Field       | Type            | Recommended Interval |
-|---------------------------|-----------------------------------------|------------------|-----------------|----------------------|
-| LstmeetingattendeeHistory | cisco:webex:meetingattendeehistory:list | joinTime         | Historical      | >= 86400             |
-| LstmeetingusageHistory    | cisco:webex:meetingusagehistory:list    | meetingStartTime | Historical      | >= 86400             |
-| LsteventsessionHistory    | cisco:webex:eventsessionhistory:list    | sessionStartTime | Historical      | >= 86400             |
-| LstrecordaccessHistory    | cisco:webex:recordaccesshistory:list    | creationTime     | Historical      | >= 86400             |
-| LstsupportsessionHistory  | cisco:webex:supportsessionhistory:list  | sessionStartTime | Historical      | >= 86400             |
-| LsttrainingsessionHistory | cisco:webex:trainingsessionhistory:list | sessionStartTime | Historical      | >= 86400             |
-| LstsummarySession         | cisco:webex:session:list                | actualStartTime  | Active Sessions | <= 60                |
+| XML API                   | Sourcetype                                          | Time Field       | Type            | Recommended Interval |
+|---------------------------|-----------------------------------------------------|------------------|-----------------|----------------------|
+| LstmeetingattendeeHistory | cisco:webex:meetings:history:meetingattendeehistory | joinTime         | Historical      | >= 86400             |
+| LstmeetingusageHistory    | cisco:webex:meetings:history:meetingusagehistory    | meetingStartTime | Historical      | >= 86400             |
+| LsteventsessionHistory    | cisco:webex:meetings:history:eventsessionhistory    | sessionStartTime | Historical      | >= 86400             |
+| LstrecordaccessHistory    | cisco:webex:meetings:history:recordaccesshistory    | creationTime     | Historical      | >= 86400             |
+| LstsupportsessionHistory  | cisco:webex:meetings:history:supportsessionhistory  | sessionStartTime | Historical      | >= 86400             |
+| LsttrainingsessionHistory | cisco:webex:meetings:history:trainingsessionhistory | sessionStartTime | Historical      | >= 86400             |
+| LstsummarySession         | cisco:webex:meetings:general:summarysession         | actualStartTime  | Active Sessions | <= 60                |
 
 
 **DISCLAIMER**: Guidance from Cisco states historical data retrieval may be incomplete if fetched less than 48 hours from time meetings ended. Therefore it's recommended to set the interval to 86400 or more for historical input.
