@@ -12,6 +12,7 @@ from collections import defaultdict
 from xml.etree import cElementTree as ETree
 import json
 from datetime import date, timedelta
+from datetime import datetime
 
 #from MaxStack_list import MaxStack_list
 from xml_payload_format import xml_format
@@ -101,10 +102,10 @@ def validate_input(helper, definition):
     try:
         # if not live:
         if start_time_start:
-            datetime.datetime.strptime(
+            datetime.strptime(
                 start_time_start, '%m/%d/%Y %H:%M:%S')
         if start_time_end:
-            datetime.datetime.strptime(start_time_end, '%m/%d/%Y %H:%M:%S')
+            datetime.strptime(start_time_end, '%m/%d/%Y %H:%M:%S')
     except ValueError:
         raise ValueError(
             "Incorrect data format, time should be MM/DD/YYYY hh:mm:ss")
@@ -159,26 +160,32 @@ def collect_events(helper, ew):
         start_time = helper.get_check_point(timestamp_key)
         helper.log_debug("timestamp_value: {}".format(start_time))
         if start_time:
-            start_time = datetime.datetime.strptime(
-                start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            # start_time = datetime.strptime(
+            # start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            start_time = datetime.strptime(
+                start_time, '%m/%d/%Y %H:%M:%S')
+            start_time = (start_time - datetime(1970, 1, 1)
+                          ).total_seconds()
             start_time = int(start_time) + 1
-            start_time = datetime.datetime.fromtimestamp(
+            start_time = datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-        end_time_epoch = datetime.datetime.utcnow().strftime("%s")
+        end_time_epoch = datetime.utcnow()
+        end_time_epoch = (end_time_epoch - datetime(1970, 1, 1)
+                          ).total_seconds()
 
         if start_time is None:
             start_time = int(end_time_epoch) - opt_interval + 1
             helper.log_debug("type of start time: {}".format(type(start_time)))
             helper.log_debug("***start time***: {}".format(start_time))
-            start_time = datetime.datetime.fromtimestamp(
+            start_time = datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
             helper.save_check_point(timestamp_key, start_time)
 
         helper.log_debug("type of start time: {}".format(type(start_time)))
         helper.log_debug("---start time---: {}".format(start_time))
 
-        end_time = datetime.datetime.fromtimestamp(
+        end_time = datetime.fromtimestamp(
             int(end_time_epoch)).strftime('%m/%d/%Y %H:%M:%S')
         helper.log_debug("start time: {}".format(start_time))
         helper.log_debug("end time: {}".format(end_time))
@@ -207,10 +214,10 @@ def collect_events(helper, ew):
             helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
             # endtime is midnight of GMT - 3days
-            # end_time = datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
-            enddt = datetime.datetime.utcnow().date() - timedelta(3)
-            end_time = datetime.datetime.combine(
-                enddt, datetime.datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
+            # end_time = datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
+            enddt = datetime.utcnow().date() - timedelta(3)
+            end_time = datetime.combine(
+                enddt, datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
 
             # create checkpoint key for offest and timestamp
             timestamp_key = "timestamp_{}_{}_processing".format(
@@ -222,10 +229,12 @@ def collect_events(helper, ew):
                 helper.save_check_point(timestamp_key, start_time)
             else:
                 # shift the starttime by 1 second
-                start_time = datetime.datetime.strptime(
-                    start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+                start_time = datetime.strptime(
+                    start_time, '%m/%d/%Y %H:%M:%S')
+                start_time = (start_time - datetime(1970, 1, 1)
+                              ).total_seconds()
                 start_time = int(start_time) + 1
-                start_time = datetime.datetime.fromtimestamp(
+                start_time = datetime.fromtimestamp(
                     int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
             # maxStack.empty()
@@ -349,17 +358,23 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
         this_event_start_time = event[start_time_map[opt_endpoint]]
         helper.log_debug(
             "\t Event start time: {}".format(this_event_start_time))
-        this_event_start_time = datetime.datetime.strptime(
-            this_event_start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        this_event_start_time = datetime.strptime(
+            this_event_start_time, '%m/%d/%Y %H:%M:%S')
+        this_event_start_time = (
+            this_event_start_time - datetime(1970, 1, 1)).total_seconds()
 
     try:
-        this_event_time = datetime.datetime.strptime(
-            this_event_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        this_event_time = datetime.strptime(
+            this_event_time, '%m/%d/%Y %H:%M:%S')
+        this_event_time = (
+            this_event_time - datetime(1970, 1, 1)).total_seconds()
 
         # Prevent Duplicates in Session Mode
         if params['mode'] == "live":
-            start_time = datetime.datetime.strptime(
-                params['start_time'], '%m/%d/%Y %H:%M:%S').strftime("%s")
+            start_time = datetime.strptime(
+                params['start_time'], '%m/%d/%Y %H:%M:%S')
+            start_time = (
+                start_time - datetime(1970, 1, 1)).total_seconds()
             # actualStartTime is this_event_time
             helper.log_debug(
                 "\t\t\t [--] {} < {}".format(this_event_time, start_time))
@@ -373,11 +388,12 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
 
         # update the checkpoint for timestamp
         timestamp = helper.get_check_point(timestamp_key)
-        timestamp = datetime.datetime.strptime(
-            timestamp, '%m/%d/%Y %H:%M:%S').strftime("%s")
+        timestamp = datetime.strptime(
+            timestamp, '%m/%d/%Y %H:%M:%S')
+        timestamp = (timestamp - datetime(1970, 1, 1)).total_seconds()
         timestamp = max(int(timestamp), int(this_event_time))
         helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
-        helper.save_check_point(timestamp_key, datetime.datetime.fromtimestamp(
+        helper.save_check_point(timestamp_key, datetime.fromtimestamp(
             int(timestamp)).strftime('%m/%d/%Y %H:%M:%S'))
 
     except Exception as e:
