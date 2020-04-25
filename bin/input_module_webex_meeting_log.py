@@ -28,13 +28,13 @@ tag_map = {
 }
 
 sourcetype_map = {
-    "LstmeetingattendeeHistory": "cisco:webex:meetingattendeehistory:list",
-    "LstmeetingusageHistory": "cisco:webex:meetingusagehistory:list",
-    "LsteventsessionHistory": "cisco:webex:eventsessionhistory:list",
-    "LstrecordaccessHistory": "cisco:webex:recordaccesshistory:list",
-    "LstsupportsessionHistory": "cisco:webex:supportsessionhistory:list",
-    "LsttrainingsessionHistory": "cisco:webex:trainingsessionhistory:list",
-    "LstsummarySession": "cisco:webex:session:list"
+    "LstmeetingattendeeHistory": "cisco:webex:meetings:history:meetingattendeehistory",
+    "LstmeetingusageHistory": "cisco:webex:meetings:history:meetingusagehistory",
+    "LsteventsessionHistory": "cisco:webex:meetings:history:eventsessionhistory",
+    "LstrecordaccessHistory": "cisco:webex:meetings:history:recordaccesshistory",
+    "LstsupportsessionHistory": "cisco:webex:meetings:history:supportsessionhistory",
+    "LsttrainingsessionHistory": "cisco:webex:meetings:history:trainingsessionhistory",
+    "LstsummarySession": "cisco:webex:meetings:general:summarysession"
 }
 
 # End time tag map: use this for timestamp checkpoint
@@ -160,19 +160,21 @@ def collect_events(helper, ew):
         start_time = helper.get_check_point(timestamp_key)
         helper.log_debug("timestamp_value: {}".format(start_time))
         if start_time:
-            # start_time = datetime.strptime(
-            # start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            start_time = datetime.strptime(
+                start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
+            '''
             start_time = datetime.strptime(
                 start_time, '%m/%d/%Y %H:%M:%S')
             start_time = (start_time - datetime(1970, 1, 1)
                           ).total_seconds()
+            '''
             start_time = int(start_time) + 1
             start_time = datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-        end_time_epoch = datetime.utcnow()
-        end_time_epoch = (end_time_epoch - datetime(1970, 1, 1)
-                          ).total_seconds()
+        end_time_epoch = datetime.utcnow().strftime("%s")
+        # end_time_epoch = (end_time_epoch - datetime(1970, 1, 1)
+        # ).total_seconds()
 
         if start_time is None:
             start_time = int(end_time_epoch) - opt_interval + 1
@@ -230,9 +232,9 @@ def collect_events(helper, ew):
             else:
                 # shift the starttime by 1 second
                 start_time = datetime.strptime(
-                    start_time, '%m/%d/%Y %H:%M:%S')
-                start_time = (start_time - datetime(1970, 1, 1)
-                              ).total_seconds()
+                    start_time, '%m/%d/%Y %H:%M:%S').strftime('%s')
+                # start_time = (start_time - datetime(1970, 1, 1)
+                #              ).total_seconds()
                 start_time = int(start_time) + 1
                 start_time = datetime.fromtimestamp(
                     int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
@@ -280,6 +282,7 @@ def fetch_webex_logs(ew, helper, params):
 
     # Build Payload
     payload = xml_format(params)
+    helper.log_debug(payload)
     helper.log_debug("payload start time: {}".format(params['start_time']))
 
     helper.log_debug(
@@ -360,21 +363,22 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
             "\t Event start time: {}".format(this_event_start_time))
         this_event_start_time = datetime.strptime(
             this_event_start_time, '%m/%d/%Y %H:%M:%S')
+
         this_event_start_time = (
             this_event_start_time - datetime(1970, 1, 1)).total_seconds()
 
     try:
         this_event_time = datetime.strptime(
-            this_event_time, '%m/%d/%Y %H:%M:%S')
-        this_event_time = (
-            this_event_time - datetime(1970, 1, 1)).total_seconds()
+            this_event_time, '%m/%d/%Y %H:%M:%S').strftime('%s')
+        # this_event_time = (
+        #    this_event_time - datetime(1970, 1, 1)).total_seconds()
 
         # Prevent Duplicates in Session Mode
         if params['mode'] == "live":
             start_time = datetime.strptime(
-                params['start_time'], '%m/%d/%Y %H:%M:%S')
-            start_time = (
-                start_time - datetime(1970, 1, 1)).total_seconds()
+                params['start_time'], '%m/%d/%Y %H:%M:%S').strftime('%s')
+            # start_time = (
+            #    start_time - datetime(1970, 1, 1)).total_seconds()
             # actualStartTime is this_event_time
             helper.log_debug(
                 "\t\t\t [--] {} < {}".format(this_event_time, start_time))
@@ -389,8 +393,8 @@ def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
         # update the checkpoint for timestamp
         timestamp = helper.get_check_point(timestamp_key)
         timestamp = datetime.strptime(
-            timestamp, '%m/%d/%Y %H:%M:%S')
-        timestamp = (timestamp - datetime(1970, 1, 1)).total_seconds()
+            timestamp, '%m/%d/%Y %H:%M:%S').strftime('%s')
+        # timestamp = (timestamp - datetime(1970, 1, 1)).total_seconds()
         timestamp = max(int(timestamp), int(this_event_time))
         helper.log_debug("\t\t[-]time: timestamp: {}".format(timestamp))
         helper.save_check_point(timestamp_key, datetime.fromtimestamp(
