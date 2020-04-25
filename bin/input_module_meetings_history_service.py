@@ -17,61 +17,7 @@ from datetime import datetime
 
 from xml_payload_format import xml_format
 
-tag_map = {
-    "LstmeetingattendeeHistory": "meetingAttendeeHistory",
-    "LstmeetingusageHistory": "meetingUsageHistory",
-    "LsteventsessionHistory": "eventSessionHistory",
-    "LstrecordaccessHistory": "recordAccessHistory",
-    "LstsupportsessionHistory": "supportSessionHistory",
-    "LsttrainingsessionHistory": "trainingSessionHistory",
-    "LstsummarySession": "session"
-}
-
-sourcetype_map = {
-    "LstmeetingattendeeHistory": "cisco:webex:meetings:history:meetingattendeehistory",
-    "LstmeetingusageHistory": "cisco:webex:meetings:history:meetingusagehistory",
-    "LsteventsessionHistory": "cisco:webex:meetings:history:eventsessionhistory",
-    "LstrecordaccessHistory": "cisco:webex:meetings:history:recordaccesshistory",
-    "LstsupportsessionHistory": "cisco:webex:meetings:history:supportsessionhistory",
-    "LsttrainingsessionHistory": "cisco:webex:meetings:history:trainingsessionhistory",
-    "LstsummarySession": "cisco:webex:meetings:general:summarysession"
-}
-
-# End time tag map: use this for timestamp checkpoint
-timestamp_map = {
-    "LstmeetingattendeeHistory": "leaveTime",
-    "LstmeetingusageHistory": "meetingEndTime",
-    "LsteventsessionHistory": "sessionEndTime",
-    "LstrecordaccessHistory": "creationTime",
-    "LstsupportsessionHistory": "sessionEndTime",
-    "LsttrainingsessionHistory": "sessionEndTime",
-    "LstsummarySession": "actualStartTime"
-}
-
-# Start time tag map: use this for time extration
-start_time_map = {
-    "LstmeetingattendeeHistory": "joinTime",
-    "LstmeetingusageHistory": "meetingStartTime",
-    "LsteventsessionHistory": "sessionStartTime",
-    "LstrecordaccessHistory": "creationTime",
-    "LstsupportsessionHistory": "sessionStartTime",
-    "LsttrainingsessionHistory": "sessionStartTime",
-    "LstsummarySession": "actualStartTime"
-}
-#maxStack = MaxStack_list()
-
-
-'''
-    IMPORTANT
-    Edit only the validate_input and collect_events functions.
-    Do not edit any other part in this file.
-    This file is generated only once when creating the modular input.
-'''
-'''
-# For advanced users, if you want to create single instance mod input, uncomment this method.
-def use_single_instance_mode():
-    return True
-'''
+import webex_constant
 
 
 def validate_input(helper, definition):
@@ -112,80 +58,55 @@ def collect_events(helper, ew):
     opt_start_time_start = helper.get_arg('start_time_start')
     opt_endpoints = helper.get_arg('endpoint')
     opt_interval = int(helper.get_arg('interval'))
-    opt_live = helper.get_arg('live')
+    opt_live = False
 
-    params = {"opt_username": helper.get_arg('username'),
-              "opt_password": helper.get_arg('password'),
-              "opt_site_name": helper.get_arg('site_name'),
+    params = {"opt_username": helper.get_global_setting("username"),
+              "opt_password": helper.get_global_setting("password"),
+              "opt_site_name": helper.get_global_setting("site_name"),
               "limit": 500,
               "timezone": "20",
               "password_type": helper.get_arg('password_type')}
 
-    if opt_live is True:
-        # do the time magic
-        # run the unique endpoint
-        # End time : time.now -> convert to epoch
-        # Start time : end time - 600
-        # Then query the live session endpoint with these parameters, along with timezone (if applicable)
-        # opt_interval = 600
+    # Historical Data
+    helper.log_debug("Historical Data")
+    for opt_endpoint in opt_endpoints:
+        helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
-        params.update({"opt_endpoint": "LstsummarySession"})
+        # endtime is midnight of GMT - 3days
+        # end_time = datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
+        enddt = datetime.utcnow().date() - timedelta(3)
+        end_time = datetime.combine(
+            enddt, datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
 
+        # create checkpoint key for offest and timestamp
         timestamp_key = "timestamp_{}_{}_processing".format(
-            helper.get_input_stanza_names(), params['opt_endpoint'])
-
-        # Get previously ingested confID
-        """
-        params['confID_key'] = "confID_{}_{}_processing".format(
-            helper.get_input_stanza_names(), params['opt_endpoint'])
-        confID_keys = helper.get_check_point(params['confID_key'])
-        if confID_keys:
-            params['confID_keys'] = json.loads(confID_keys)
-        else:
-            params['confID_keys'] = json.loads('[]')
-        """
+            helper.get_input_stanza_names(), opt_endpoint)
 
         start_time = helper.get_check_point(timestamp_key)
-        helper.log_debug("timestamp_value: {}".format(start_time))
-        if start_time:
+        if start_time is None:
+            start_time = opt_start_time_start
+            helper.save_check_point(timestamp_key, start_time)
+        else:
+            # shift the starttime by 1 second
             start_time = datetime.strptime(
-                start_time, '%m/%d/%Y %H:%M:%S').strftime("%s")
-            '''
-            start_time = datetime.strptime(
-                start_time, '%m/%d/%Y %H:%M:%S')
-            start_time = (start_time - datetime(1970, 1, 1)
-                          ).total_seconds()
-            '''
+                start_time, '%m/%d/%Y %H:%M:%S').strftime('%s')
+            # start_time = (start_time - datetime(1970, 1, 1)
+            #              ).total_seconds()
             start_time = int(start_time) + 1
             start_time = datetime.fromtimestamp(
                 int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
 
-        end_time_epoch = datetime.utcnow().strftime("%s")
-        # end_time_epoch = (end_time_epoch - datetime(1970, 1, 1)
-        # ).total_seconds()
+        # maxStack.empty()
 
-        if start_time is None:
-            start_time = int(end_time_epoch) - opt_interval + 1
-            helper.log_debug("type of start time: {}".format(type(start_time)))
-            helper.log_debug("***start time***: {}".format(start_time))
-            start_time = datetime.fromtimestamp(
-                int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
-            helper.save_check_point(timestamp_key, start_time)
-
-        helper.log_debug("type of start time: {}".format(type(start_time)))
-        helper.log_debug("---start time---: {}".format(start_time))
-
-        end_time = datetime.fromtimestamp(
-            int(end_time_epoch)).strftime('%m/%d/%Y %H:%M:%S')
-        helper.log_debug("start time: {}".format(start_time))
-        helper.log_debug("end time: {}".format(end_time))
+        helper.log_debug("Start time: {}".format(start_time))
+        helper.log_debug("End time: {}".format(end_time))
 
         #  Update Parameters
-        params.update({"mode": "live"})
+        params.update({"mode": "historical"})
+        params.update({"opt_endpoint": opt_endpoint})
         params.update({"start_time": start_time})
         params.update({"end_time": end_time})
         params.update({"timestamp_key": timestamp_key})
-        params.update({"end_time_epoch": end_time_epoch})
 
         records = params['limit']
         offset = 1
@@ -193,62 +114,10 @@ def collect_events(helper, ew):
             helper.log_debug("current_offset: {}".format(offset))
             params['offset'] = offset
             records = fetch_webex_logs(ew, helper, params)
-
+            helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
+                offset, params['limit'], records))
             if records:
                 offset += records
-
-    # Historical Data
-    if opt_live is not True:
-        helper.log_debug("Historical Data")
-        for opt_endpoint in opt_endpoints:
-            helper.log_debug("[-] \t At {}".format(opt_endpoint))
-
-            # endtime is midnight of GMT - 3days
-            # end_time = datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
-            enddt = datetime.utcnow().date() - timedelta(3)
-            end_time = datetime.combine(
-                enddt, datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
-
-            # create checkpoint key for offest and timestamp
-            timestamp_key = "timestamp_{}_{}_processing".format(
-                helper.get_input_stanza_names(), opt_endpoint)
-
-            start_time = helper.get_check_point(timestamp_key)
-            if start_time is None:
-                start_time = opt_start_time_start
-                helper.save_check_point(timestamp_key, start_time)
-            else:
-                # shift the starttime by 1 second
-                start_time = datetime.strptime(
-                    start_time, '%m/%d/%Y %H:%M:%S').strftime('%s')
-                # start_time = (start_time - datetime(1970, 1, 1)
-                #              ).total_seconds()
-                start_time = int(start_time) + 1
-                start_time = datetime.fromtimestamp(
-                    int(start_time)).strftime('%m/%d/%Y %H:%M:%S')
-
-            # maxStack.empty()
-
-            helper.log_debug("Start time: {}".format(start_time))
-            helper.log_debug("End time: {}".format(end_time))
-
-            #  Update Parameters
-            params.update({"mode": "historical"})
-            params.update({"opt_endpoint": opt_endpoint})
-            params.update({"start_time": start_time})
-            params.update({"end_time": end_time})
-            params.update({"timestamp_key": timestamp_key})
-
-            records = params['limit']
-            offset = 1
-            while (records == params['limit']):
-                helper.log_debug("current_offset: {}".format(offset))
-                params['offset'] = offset
-                records = fetch_webex_logs(ew, helper, params)
-                helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
-                    offset, params['limit'], records))
-                if records:
-                    offset += records
 
 
 def fetch_webex_logs(ew, helper, params):
