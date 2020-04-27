@@ -39,3 +39,10 @@ start_time_map = {
     "LsttrainingsessionHistory": "sessionStartTime",
     "LstsummarySession": "actualStartTime"
 }
+
+# webExAccessToken
+authentication_type = {
+    "Password Authentication" : "password",
+    "OAuth" : "webExAccessToken",
+    "SAML SSO" : "sessionTicket"
+    }

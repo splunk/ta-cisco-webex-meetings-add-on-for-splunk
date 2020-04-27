@@ -16,7 +16,7 @@ from datetime import datetime
 
 #from MaxStack_list import MaxStack_list
 from xml_payload_format import xml_format
-import webex_constant
+from webex_constant import tag_map, sourcetype_map, timestamp_map, start_time_map, authentication_type
 
 def validate_input(helper, definition):
     """Implement your own validation logic to validate the input stanza configurations"""
@@ -54,7 +54,7 @@ def collect_events(helper, ew):
               "opt_site_name": helper.get_global_setting("site_name"),
               "limit": 500,
               "timezone": "20",
-              "password_type": helper.get_arg('password_type')}
+              "password_type": authentication_type["Password Authentication"]}
 
     # if opt_live is True:
     # do the time magic
