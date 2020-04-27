@@ -92,7 +92,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 ### Input type: Historical Meetings
 
 <img src="appserver/static/img/history_service_1.png"  width="1500" height="150">
-<img src="appserver/static/img/history_sevice_2.png"  width="600" height="450">
+<img src="appserver/static/img/history_service_2.png"  width="600" height="450">
 
 
 
