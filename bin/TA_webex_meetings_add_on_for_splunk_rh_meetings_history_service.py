@@ -20,80 +20,36 @@ fields = [
         encrypted=False,
         default=None,
         validator=validator.Pattern(
-            regex=r"""^\-[1-9]\d*$|^\d*$""", 
+            regex=r"""^\-[1-9]\d*$|^\d*$""",
         )
-    ), 
+    ),
     field.RestField(
         'index',
         required=True,
         encrypted=False,
         default='default',
         validator=validator.String(
-            min_len=1, 
-            max_len=80, 
+            min_len=1,
+            max_len=80,
         )
-    ), 
+    ),
     field.RestField(
-        'site_name',
+        'endpoints',
         required=True,
-        encrypted=False,
-        default=None,
-        validator=validator.String(
-            min_len=0, 
-            max_len=8192, 
-        )
-    ), 
-    field.RestField(
-        'username',
-        required=True,
-        encrypted=False,
-        default=None,
-        validator=validator.String(
-            min_len=0, 
-            max_len=8192, 
-        )
-    ), 
-    field.RestField(
-        'password_type',
-        required=True,
-        encrypted=False,
-        default='password',
-        validator=None
-    ), 
-    field.RestField(
-        'password',
-        required=True,
-        encrypted=True,
-        default=None,
-        validator=validator.String(
-            min_len=0, 
-            max_len=8192, 
-        )
-    ), 
-    field.RestField(
-        'live',
-        required=False,
         encrypted=False,
         default=None,
         validator=None
-    ), 
-    field.RestField(
-        'endpoint',
-        required=False,
-        encrypted=False,
-        default=None,
-        validator=None
-    ), 
+    ),
     field.RestField(
         'start_time_start',
-        required=False,
+        required=True,
         encrypted=False,
         default=None,
         validator=validator.String(
-            min_len=0, 
-            max_len=8192, 
+            min_len=0,
+            max_len=8192,
         )
-    ), 
+    ),
 
     field.RestField(
         'disabled',
@@ -105,9 +61,8 @@ fields = [
 model = RestModel(fields, name=None)
 
 
-
 endpoint = DataInputModel(
-    'webex_meeting_log',
+    'meetings_history_service',
     model,
 )
 

@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-webex-meetings-add-on-for-splunk",
         "displayName": "WebEx Meetings Add-on for Splunk",
-        "version": "1.0.4",
+        "version": "1.1.0",
         "apiVersion": "3.0.0",
         "restRoot": "TA_webex_meetings_add_on_for_splunk"
     },
@@ -10,41 +10,94 @@
         "configuration": {
             "title": "Configuration",
             "description": "Set up your add-on",
-            "tabs": [
-                {
+            "tabs": [{
                     "name": "logging",
                     "title": "Logging",
-                    "entity": [
-                        {
-                            "field": "loglevel",
-                            "label": "Log level",
-                            "type": "singleSelect",
+                    "entity": [{
+                        "field": "loglevel",
+                        "label": "Log level",
+                        "type": "singleSelect",
+                        "options": {
+                            "disableSearch": true,
+                            "autoCompleteFields": [{
+                                    "label": "DEBUG",
+                                    "value": "DEBUG"
+                                },
+                                {
+                                    "label": "INFO",
+                                    "value": "INFO"
+                                },
+                                {
+                                    "label": "WARNING",
+                                    "value": "WARNING"
+                                },
+                                {
+                                    "label": "ERROR",
+                                    "value": "ERROR"
+                                },
+                                {
+                                    "label": "CRITICAL",
+                                    "value": "CRITICAL"
+                                }
+                            ]
+                        },
+                        "defaultValue": "INFO"
+                    }]
+                },
+                {
+                    "name": "additional_parameters",
+                    "title": "Add-on Settings",
+                    "entity": [{
+                            "field": "site_name",
+                            "label": "Site Name",
+                            "type": "text",
+                            "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://mysitename.webex.com specify mysitename",
+                            "required": true,
+                            "defaultValue": "",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
                             "options": {
-                                "disableSearch": true,
-                                "autoCompleteFields": [
-                                    {
-                                        "label": "DEBUG",
-                                        "value": "DEBUG"
-                                    },
-                                    {
-                                        "label": "INFO",
-                                        "value": "INFO"
-                                    },
-                                    {
-                                        "label": "WARNING",
-                                        "value": "WARNING"
-                                    },
-                                    {
-                                        "label": "ERROR",
-                                        "value": "ERROR"
-                                    },
-                                    {
-                                        "label": "CRITICAL",
-                                        "value": "CRITICAL"
-                                    }
-                                ]
-                            },
-                            "defaultValue": "INFO"
+                                "placeholder": "mysitename"
+                            }
+                        },
+                        {
+                            "field": "username",
+                            "label": "Username",
+                            "type": "text",
+                            "help": "Service Account Username or Email address of the host or admin account making a request.",
+                            "required": true,
+                            "defaultValue": "",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "localuser or user@example.com"
+                            }
+                        },
+                        {
+                            "field": "password",
+                            "label": "Password",
+                            "type": "text",
+                            "help": "Service Account Password",
+                            "required": true,
+                            "defaultValue": "",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "*  *  *"
+                            }
                         }
                     ]
                 }
@@ -54,8 +107,7 @@
             "title": "Inputs",
             "description": "Manage your data inputs",
             "table": {
-                "header": [
-                    {
+                "header": [{
                         "field": "name",
                         "label": "Name"
                     },
@@ -72,8 +124,7 @@
                         "label": "Status"
                     }
                 ],
-                "moreInfo": [
-                    {
+                "moreInfo": [{
                         "field": "name",
                         "label": "Name"
                     },
@@ -90,32 +141,16 @@
                         "label": "Status"
                     },
                     {
-                        "field": "site_name",
-                        "label": "Site Name"
-                    },
-                    {
-                        "field": "username",
-                        "label": "Username"
-                    },
-                    {
-                        "field": "password_type",
-                        "label": "Authentication Method"
-                    },
-                    {
-                        "field": "password",
-                        "label": "Password"
-                    },
-                    {
-                        "field": "live",
-                        "label": "Continuous Monitoring"
-                    },
-                    {
-                        "field": "endpoint",
-                        "label": "Historical Endpoints"
+                        "field": "endpoints",
+                        "label": "Endpoints"
                     },
                     {
                         "field": "start_time_start",
                         "label": "Begin Time"
+                    },
+                    {
+                        "field": "live",
+                        "label": "Monitor Active Session"
                     }
                 ],
                 "actions": [
@@ -125,19 +160,16 @@
                     "clone"
                 ]
             },
-            "services": [
-                {
-                    "name": "webex_meeting_log",
-                    "title": "WebEx Meeting log",
-                    "entity": [
-                        {
+            "services": [{
+                    "name": "meetings_history_service",
+                    "title": "History Service",
+                    "entity": [{
                             "field": "name",
                             "label": "Name",
                             "type": "text",
                             "help": "Enter a unique name for the data input",
                             "required": true,
-                            "validators": [
-                                {
+                            "validators": [{
                                     "type": "regex",
                                     "pattern": "^[a-zA-Z]\\w*$",
                                     "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
@@ -155,14 +187,13 @@
                             "label": "Interval",
                             "type": "text",
                             "required": true,
-                            "help": "Time interval of input in seconds.",
-                            "validators": [
-                                {
-                                    "type": "regex",
-                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
-                                    "errorMsg": "Interval must be an integer."
-                                }
-                            ]
+                            "defaultValue": "86400",
+                            "help": "Time interval of input in seconds. Interval should be 86400 or more",
+                            "validators": [{
+                                "type": "regex",
+                                "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                "errorMsg": "Interval must be an integer."
+                            }]
                         },
                         {
                             "field": "index",
@@ -175,131 +206,44 @@
                                 "createSearchChoice": true
                             },
                             "required": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 80,
-                                    "errorMsg": "Length of index name should be between 1 and 80."
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80,
+                                "errorMsg": "Length of index name should be between 1 and 80."
+                            }]
                         },
                         {
-                            "field": "site_name",
-                            "label": "Site Name",
-                            "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://meetingsamer.webex.com specify meetingsamer",
+                            "field": "endpoints",
+                            "label": "Endpoints",
+                            "help": "Please choose the endpoints to retrieve data.  \n\nNote: Meeting Usage & Meeting Attendees endpoints helps populate Dashboard.",
                             "required": true,
-                            "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
-                            "options": {
-                                "placeholder": "meetingsamer"
-                            }
-                        },
-                        {
-                            "field": "username",
-                            "label": "Username",
-                            "help": "Email address of the host or admin account making a request. ",
-                            "required": true,
-                            "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
-                            "options": {
-                                "placeholder": "user@example.com"
-                            }
-                        },
-                        {
-                            "field": "password_type",
-                            "label": "Authentication Method",
-                            "help": "Choose the Authentication method ",
-                            "required": true,
-                            "type": "singleSelect",
-                            "defaultValue": "password",
-                            "options": {
-                                "disableSearch": true,
-                                "autoCompleteFields": [
-                                    {
-                                        "value": "password",
-                                        "label": "Basic Password Auth"
-                                    },
-                                    {
-                                        "value": "webExAccessToken",
-                                        "label": "OAuth (alpha/test)"
-                                    },
-                                    {
-                                        "value": "sessionTicket",
-                                        "label": "SAML Ticket (alpha/test)"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "field": "password",
-                            "label": "Password",
-                            "help": "Password Or  Access Token Or SessionTicket",
-                            "required": true,
-                            "type": "text",
-                            "encrypted": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of password is 8192"
-                                }
-                            ]
-                        },
-                        {
-                            "field": "live",
-                            "label": "Continuous Monitoring",
-                            "help": "Use this when not retrieving historical endpoints",
-                            "required": false,
-                            "type": "checkbox"
-                        },
-                        {
-                            "field": "endpoint",
-                            "label": "Historical Endpoints",
-                            "help": "Please choose the historical endpoints that are used to fetch data back. Note: Please specify a Begin Time below and do not check the Continuous Monitoring when retrieving historical data.",
-                            "required": false,
                             "type": "multipleSelect",
                             "options": {
                                 "delimiter": "~",
-                                "items": [
-                                    {
+                                "items": [{
                                         "value": "LstmeetingusageHistory",
-                                        "label": "Meeting Usage History"
-                                    },
-                                    {
-                                        "value": "LstsupportsessionHistory",
-                                        "label": "Support Session History"
-                                    },
-                                    {
-                                        "value": "LsttrainingsessionHistory",
-                                        "label": "Training Session History"
-                                    },
-                                    {
-                                        "value": "LsteventsessionHistory",
-                                        "label": "Event Session History"
-                                    },
-                                    {
-                                        "value": "LstrecordaccessHistory",
-                                        "label": "Recorded Access History"
+                                        "label": "Meeting Usage"
                                     },
                                     {
                                         "value": "LstmeetingattendeeHistory",
-                                        "label": "Meeting Attendee History"
+                                        "label": "Meeting Attendees"
+                                    },
+                                    {
+                                        "value": "LsttrainingsessionHistory",
+                                        "label": "Training Sessions"
+                                    },
+                                    {
+                                        "value": "LsteventsessionHistory",
+                                        "label": "Event Session"
+                                    },
+                                    {
+                                        "value": "LstrecordaccessHistory",
+                                        "label": "Recorded Access"
+                                    },
+                                    {
+                                        "value": "LstsupportsessionHistory",
+                                        "label": "Support Sessions"
                                     }
                                 ]
                             }
@@ -307,20 +251,81 @@
                         {
                             "field": "start_time_start",
                             "label": "Begin Time",
-                            "help": "This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss",
-                            "required": false,
+                            "help": "This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                            "required": true,
                             "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
                             "options": {
                                 "placeholder": "04/10/2020 10:00:00"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "meetings_general_service",
+                    "title": "General Service",
+                    "entity": [{
+                            "field": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "help": "Enter a unique name for the data input",
+                            "required": true,
+                            "validators": [{
+                                    "type": "regex",
+                                    "pattern": "^[a-zA-Z]\\w*$",
+                                    "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
+                                },
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 100,
+                                    "errorMsg": "Length of input name should be between 1 and 100"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "interval",
+                            "label": "Interval",
+                            "type": "text",
+                            "required": true,
+                            "defaultValue": "60",
+                            "help": "Time interval of input in seconds. Interval should be 60 or less.",
+                            "validators": [{
+                                "type": "regex",
+                                "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                "errorMsg": "Interval must be an integer."
+                            }]
+                        },
+                        {
+                            "field": "index",
+                            "label": "Index",
+                            "type": "singleSelect",
+                            "defaultValue": "default",
+                            "options": {
+                                "endpointUrl": "data/indexes",
+                                "blackList": "^_.*$",
+                                "createSearchChoice": true
+                            },
+                            "required": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80,
+                                "errorMsg": "Length of index name should be between 1 and 80."
+                            }]
+                        },
+                        {
+                            "field": "live",
+                            "label": "Monitor Active Session",
+                            "help": "Use this to retrieve Active Session Data such as information for all service types, including Meeting Center, Training Center, Event Center, Sales Center and Support Center.",
+                            "required": false,
+                            "type": "checkbox",
+                            "defaultValue": true
                         }
                     ]
                 }
