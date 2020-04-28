@@ -1,12 +1,12 @@
-# Splunk-TA for WebEx Meetings
+# WebEx Meetings Add-on for Splunk
 
-> The **Splunk-TA for Webex Meetings** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
+> The **WebEx Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
 [![GitHub All Releases](https://img.shields.io/github/downloads/splunk/ta-webex-meetings-add-on-for-splunk/total?label=download&logo=github&style=flat-square&color=important)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
-[![Add-on Builder](https://img.shields.io/badge/built%20with-%20Python3-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
-[![ThirdPartyCredits](https://img.shields.io/badge/Thirdparty%20Credits-Addon%20Builder-purple.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Thirdpartysoftwarecredits)
+[![Add-on Builder](https://img.shields.io/badge/built%20with-%20Python%203-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
+[![ThirdPartyCredits](https://img.shields.io/badge/Third-party%20Credits-Addon%20Builder-purple.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Thirdpartysoftwarecredits)
 
 
 ## Getting Started
