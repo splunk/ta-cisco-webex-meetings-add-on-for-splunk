@@ -84,21 +84,6 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
 - Click on the `Add` green button on the bottom right of the pop up box.
 
-## Example(s)
-
-## Global Setting
-<img src="appserver/static/img/global_setting.png"  width="600" height="450">
-
-### Input type: Scheduled Active Session 
-
-<img src="appserver/static/img/general_service_1.png"  width="1500" height="150">
-<img src="appserver/static/img/general_service_2.png"  width="600" height="450">
-
-### Input type: Historical Meetings
-
-<img src="appserver/static/img/history_service_1.png"  width="1500" height="150">
-<img src="appserver/static/img/history_service_2.png"  width="600" height="450">
-
 
 
 ## Credits & Acknowledgements (optional)
