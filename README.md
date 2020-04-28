@@ -38,8 +38,6 @@ If you are managing the site from **Control Hub**, please take a look at this li
 
 Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.webex.com/en-us/v71ztb/Add-Users-Manually-in-Cisco-Webex-Control-Hub ) can also be a workaround if you have AD Connector setup as well.
 
-<img src="appserver/static/img/Add%20User.png"  width="600" height="450">
-
 
 #### Installation and Configuration Steps
 This application can be installed on-prem and cloud.
