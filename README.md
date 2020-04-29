@@ -1,6 +1,6 @@
-# WebEx Meetings Add-on for Splunk
+# Cisco WebEx Meetings Add-on for Splunk
 
-> The **WebEx Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
+> The **Cisco WebEx Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
@@ -10,7 +10,7 @@
 
 
 ## Getting Started
-This is a TA to pull in data from WebEx Meetings XML API.
+This is a TA to pull in data from Cisco WebEx Meetings XML API.
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings.
 
 | XML API                   | Sourcetype                                          | Splunk Time Field | Type            | Recommended Interval |
