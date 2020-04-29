@@ -22,7 +22,6 @@ def fetch_webex_logs(ew, helper, params):
         helper.log_debug("== Historcial Data log ==")
     elif mode is "live":
         helper.log_debug("== Live Data log ==")
-        #end_time_epoch = params['end_time_epoch']
 
     records = 0
     url = "https://{}.webex.com/WBXService/XMLService".format(

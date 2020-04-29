@@ -61,7 +61,6 @@ def collect_events(helper, ew):
         helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
         # endtime is midnight of GMT - 3days
-        # end_time = datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S')
         enddt = datetime.utcnow().date() - timedelta(3)
         end_time = datetime.combine(
             enddt, datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
