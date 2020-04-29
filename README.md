@@ -1,16 +1,14 @@
-# Cisco WebEx Meetings Add-on for Splunk
+# Cisco Webex Meetings Add-on for Splunk
 
-> The **Cisco WebEx Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
+> The **Cisco Webex Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
 [![GitHub All Releases](https://img.shields.io/github/downloads/splunk/ta-webex-meetings-add-on-for-splunk/total?label=download&logo=github&style=flat-square&color=important)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
-[![Add-on Builder](https://img.shields.io/badge/built%20with-%20Python%203-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
-[![ThirdPartyCredits](https://img.shields.io/badge/Thirdparty%20Credits-Addon%20Builder-purple.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Thirdpartysoftwarecredits)
-
+[![Add-on Builder](https://img.shields.io/badge/built%20with-AoB%20/%20Python3-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
 
 ## Getting Started
-This is a TA to pull in data from Cisco WebEx Meetings XML API.
+This is a TA to pull in data from Cisco Webex Meetings XML API.
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings.
 
 | XML API                   | Sourcetype                                          | Splunk Time Field | Type            | Recommended Interval |
@@ -39,6 +37,7 @@ If you do not have any automation enabled, you should be able to create a user, 
 If you are managing the site from **Control Hub**, please take a look at this link it should help.
 
 Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.webex.com/en-us/v71ztb/Add-Users-Manually-in-Cisco-Webex-Control-Hub ) can also be a workaround if you have AD Connector setup as well.
+
 
 
 #### Installation and Configuration Steps
@@ -84,7 +83,38 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
 - Click on the `Add` green button on the bottom right of the pop up box.
 
+## Example(s)
+
+## Global Setting
+<img src="appserver/static/img/global_setting.png"  width="600" height="450">
+
+### Input type: Scheduled Active Session 
+
+<img src="appserver/static/img/general_service_1.png"  width="1500" height="150">
+<img src="appserver/static/img/general_service_2.png"  width="600" height="450">
+
+### Input type: Historical Meetings
+
+<img src="appserver/static/img/history_service_1.png"  width="1500" height="150">
+<img src="appserver/static/img/history_service_2.png"  width="600" height="450">
 
 
-## Credits & Acknowledgements (optional)
+
+
 > Built by Splunk's FDSE Team (#team-fdse). 
+
+
+## Credits & Acknowledgements
+
+* Yuan Ling
+* Joe Welsh
+* Ankit Bhagat
+* Sandeep Vasani
+* Steven Hanna
+* Mayur Pipaliya
+
+## EOF :checkered_flag:
+
+* Want to **contribute**? Great! Feel free to create a [PR](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/pulls).
+
+* **Found a :bug: bug?** [Open an issue](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues/new) with some [emojis](http://emoji.muan.co). Issues without emojis are not valid. :trollface:

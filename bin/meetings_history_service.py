@@ -1,4 +1,4 @@
-import ta_webex_meetings_add_on_for_splunk_declare
+import ta_cisco_webex_meetings_add_on_for_splunk_declare
 
 import os
 import sys
@@ -27,7 +27,7 @@ class ModInputmeetings_history_service(modinput_wrapper.base_modinput.BaseModInp
             use_single_instance = input_module.use_single_instance_mode()
         else:
             use_single_instance = False
-        super(ModInputmeetings_history_service, self).__init__("ta_webex_meetings_add_on_for_splunk", "meetings_history_service", use_single_instance)
+        super(ModInputmeetings_history_service, self).__init__("ta_cisco_webex_meetings_add_on_for_splunk", "meetings_history_service", use_single_instance)
         self.global_checkbox_fields = None
 
     def get_scheme(self):
@@ -47,17 +47,17 @@ class ModInputmeetings_history_service(modinput_wrapper.base_modinput.BaseModInp
         For other input types, arguments should be get from input_module. Defining new input types could be easier.
         """
         scheme.add_argument(smi.Argument("endpoints", title="Endpoints",
-                                         description="Please choose the historical endpoints that are used to fetch data back. Note: Please specify a Begin Time below and do not check the Continuous Monitoring when retrieving historical data.",
+                                         description="Please choose the endpoints to retrieve data.  Note: Meeting Usage & Meeting Attendees endpoints helps populate Dashboard.",
                                          required_on_create=True,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
-                                         description="This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ssNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                                         description="This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ssNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
                                          required_on_create=True,
                                          required_on_edit=False))
         return scheme
 
     def get_app_name(self):
-        return "TA-webex-meetings-add-on-for-splunk"
+        return "TA-cisco-webex-meetings-add-on-for-splunk"
 
     def validate_input(self, definition):
         """validate the input stanza"""

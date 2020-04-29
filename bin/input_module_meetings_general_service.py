@@ -6,10 +6,12 @@ import sys
 import time
 import datetime
 import requests
-import xml.etree.ElementTree as ET
+# import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 from io import StringIO
 from collections import defaultdict
 from xml.etree import cElementTree as ETree
+
 import json
 from datetime import date, timedelta
 from datetime import datetime
@@ -152,8 +154,6 @@ def fetch_webex_logs(ew, helper, params):
 
     # Build Payload
     payload = xml_format(params)
-    helper.log_debug(payload)
-    helper.log_debug("payload start time: {}".format(params['start_time']))
 
     helper.log_debug(
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))

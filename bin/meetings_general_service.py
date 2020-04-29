@@ -1,4 +1,4 @@
-import ta_webex_meetings_add_on_for_splunk_declare
+import ta_cisco_webex_meetings_add_on_for_splunk_declare
 
 import os
 import sys
@@ -27,7 +27,7 @@ class ModInputmeetings_general_service(modinput_wrapper.base_modinput.BaseModInp
             use_single_instance = input_module.use_single_instance_mode()
         else:
             use_single_instance = False
-        super(ModInputmeetings_general_service, self).__init__("ta_webex_meetings_add_on_for_splunk", "meetings_general_service", use_single_instance)
+        super(ModInputmeetings_general_service, self).__init__("ta_cisco_webex_meetings_add_on_for_splunk", "meetings_general_service", use_single_instance)
         self.global_checkbox_fields = None
 
     def get_scheme(self):
@@ -53,7 +53,7 @@ class ModInputmeetings_general_service(modinput_wrapper.base_modinput.BaseModInp
         return scheme
 
     def get_app_name(self):
-        return "TA-webex-meetings-add-on-for-splunk"
+        return "TA-cisco-webex-meetings-add-on-for-splunk"
 
     def validate_input(self, definition):
         """validate the input stanza"""

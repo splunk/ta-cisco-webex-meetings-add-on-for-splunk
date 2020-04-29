@@ -1,10 +1,10 @@
 {
     "meta": {
-        "name": "TA-webex-meetings-add-on-for-splunk",
+        "name": "TA-cisco-webex-meetings-add-on-for-splunk",
         "displayName": "WebEx Meetings Add-on for Splunk",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "apiVersion": "3.0.0",
-        "restRoot": "TA_webex_meetings_add_on_for_splunk"
+        "restRoot": "TA_cisco_webex_meetings_add_on_for_splunk"
     },
     "pages": {
         "configuration": {
@@ -57,7 +57,7 @@
                             "label": "Site Name",
                             "type": "text",
                             "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://mysitename.webex.com specify mysitename",
-                            "required": false,
+                            "required": true,
                             "defaultValue": "",
                             "validators": [
                                 {
@@ -154,16 +154,16 @@
                         "label": "Status"
                     },
                     {
-                        "field": "live",
-                        "label": "Monitor Active Session"
-                    },
-                    {
                         "field": "endpoints",
                         "label": "Endpoints"
                     },
                     {
                         "field": "start_time_start",
                         "label": "Begin Time"
+                    },
+                    {
+                        "field": "live",
+                        "label": "Monitor Active Session"
                     }
                 ],
                 "actions": [
@@ -174,6 +174,120 @@
                 ]
             },
             "services": [
+                {
+                    "name": "meetings_history_service",
+                    "title": "History Service",
+                    "entity": [
+                        {
+                            "field": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "help": "Enter a unique name for the data input",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "pattern": "^[a-zA-Z]\\w*$",
+                                    "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
+                                },
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 100,
+                                    "errorMsg": "Length of input name should be between 1 and 100"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "interval",
+                            "label": "Interval",
+                            "type": "text",
+                            "required": true,
+                            "help": "Time interval of input in seconds.",
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                    "errorMsg": "Interval must be an integer."
+                                }
+                            ]
+                        },
+                        {
+                            "field": "index",
+                            "label": "Index",
+                            "type": "singleSelect",
+                            "defaultValue": "default",
+                            "options": {
+                                "endpointUrl": "data/indexes",
+                                "blackList": "^_.*$",
+                                "createSearchChoice": true
+                            },
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80,
+                                    "errorMsg": "Length of index name should be between 1 and 80."
+                                }
+                            ]
+                        },
+                        {
+                            "field": "endpoints",
+                            "label": "Endpoints",
+                            "help": "Please choose the endpoints to retrieve data.  \n\nNote: Meeting Usage & Meeting Attendees endpoints helps populate Dashboard.",
+                            "required": true,
+                            "type": "multipleSelect",
+                            "options": {
+                                "delimiter": "~",
+                                "items": [
+                                    {
+                                        "value": "LstmeetingusageHistory",
+                                        "label": "Meeting Usage"
+                                    },
+                                    {
+                                        "value": "LstmeetingattendeeHistory",
+                                        "label": "Meeting Attendees"
+                                    },
+                                    {
+                                        "value": "LsttrainingsessionHistory",
+                                        "label": "Training Sessions"
+                                    },
+                                    {
+                                        "value": "LsteventsessionHistory",
+                                        "label": "Event Session"
+                                    },
+                                    {
+                                        "value": "LstrecordaccessHistory",
+                                        "label": "Recorded Access"
+                                    },
+                                    {
+                                        "value": "LstsupportsessionHistory",
+                                        "label": "Support Sessions"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "field": "start_time_start",
+                            "label": "Begin Time",
+                            "help": "This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                            "required": true,
+                            "type": "text",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Max length of text input is 8192"
+                                }
+                            ],
+                            "options": {
+                                "placeholder": "04/10/2020 10:00:00"
+                            }
+                        }
+                    ]
+                },
                 {
                     "name": "meetings_general_service",
                     "title": "General Service",
@@ -239,120 +353,6 @@
                             "required": false,
                             "type": "checkbox",
                             "defaultValue": true
-                        }
-                    ]
-                },
-                {
-                    "name": "meetings_history_service",
-                    "title": "History Service",
-                    "entity": [
-                        {
-                            "field": "name",
-                            "label": "Name",
-                            "type": "text",
-                            "help": "Enter a unique name for the data input",
-                            "required": true,
-                            "validators": [
-                                {
-                                    "type": "regex",
-                                    "pattern": "^[a-zA-Z]\\w*$",
-                                    "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
-                                },
-                                {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 100,
-                                    "errorMsg": "Length of input name should be between 1 and 100"
-                                }
-                            ]
-                        },
-                        {
-                            "field": "interval",
-                            "label": "Interval",
-                            "type": "text",
-                            "required": true,
-                            "help": "Time interval of input in seconds.",
-                            "validators": [
-                                {
-                                    "type": "regex",
-                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
-                                    "errorMsg": "Interval must be an integer."
-                                }
-                            ]
-                        },
-                        {
-                            "field": "index",
-                            "label": "Index",
-                            "type": "singleSelect",
-                            "defaultValue": "default",
-                            "options": {
-                                "endpointUrl": "data/indexes",
-                                "blackList": "^_.*$",
-                                "createSearchChoice": true
-                            },
-                            "required": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 80,
-                                    "errorMsg": "Length of index name should be between 1 and 80."
-                                }
-                            ]
-                        },
-                        {
-                            "field": "endpoints",
-                            "label": "Endpoints",
-                            "help": "Please choose the historical endpoints that are used to fetch data back. Note: Please specify a Begin Time below and do not check the Continuous Monitoring when retrieving historical data.",
-                            "required": true,
-                            "type": "multipleSelect",
-                            "options": {
-                                "delimiter": "~",
-                                "items": [
-                                    {
-                                        "value": "LstmeetingusageHistory",
-                                        "label": "Meeting Usage"
-                                    },
-                                    {
-                                        "value": "LstsupportsessionHistory",
-                                        "label": "Support Sessions"
-                                    },
-                                    {
-                                        "value": "LsttrainingsessionHistory",
-                                        "label": "Training Sessions"
-                                    },
-                                    {
-                                        "value": "LsteventsessionHistory",
-                                        "label": "Event Session"
-                                    },
-                                    {
-                                        "value": "LstrecordaccessHistory",
-                                        "label": "Recorded Access"
-                                    },
-                                    {
-                                        "value": "LstmeetingattendeeHistory",
-                                        "label": "Meeting Attendees"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "field": "start_time_start",
-                            "label": "Begin Time",
-                            "help": "This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
-                            "required": true,
-                            "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
-                            "options": {
-                                "placeholder": "04/10/2020 10:00:00"
-                            }
                         }
                     ]
                 }
