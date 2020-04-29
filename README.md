@@ -1,6 +1,6 @@
-# Cisco Webex Meetings Add-on for Splunk
+# Splunk-TA for WebEx Meetings
 
-> The **Cisco Webex Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
+> The **Splunk-TA for Webex Meetings** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
@@ -8,7 +8,7 @@
 [![Add-on Builder](https://img.shields.io/badge/built%20with-AoB%20/%20Python3-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
 
 ## Getting Started
-This is a TA to pull in data from Cisco Webex Meetings XML API.
+This is a TA to pull in data from WebEx Meetings XML API.
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings.
 
 | XML API                   | Sourcetype                                          | Splunk Time Field | Type            | Recommended Interval |
@@ -38,6 +38,7 @@ If you are managing the site from **Control Hub**, please take a look at this li
 
 Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.webex.com/en-us/v71ztb/Add-Users-Manually-in-Cisco-Webex-Control-Hub ) can also be a workaround if you have AD Connector setup as well.
 
+<img src="appserver/static/img/Add%20User.png"  width="600" height="450">
 
 
 #### Installation and Configuration Steps
