@@ -5,7 +5,7 @@
     "id": {
       "group": null,
       "name": "TA-webex-meetings-add-on-for-splunk",
-      "version": "1.1.0"
+      "version": "1.1.1"
     },
     "author": [
       {
@@ -15,7 +15,7 @@
       }
     ],
     "releaseDate": null,
-    "description": "This Add-on allows you to get data from WebEx Meetings XML API.  Check README.md for more information.",
+    "description": "This Addon allows you to get data from WebEx meetings API. Check README.md for more information.",
     "classification": {
       "intendedAudience": null,
       "categories": [],
