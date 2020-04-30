@@ -93,3 +93,4 @@ def xml_format(params):
         </body>
     </serv:message>""".format(auth=auth, endpoint=endpoint, TimeScope=TimeScope, offset=offset, limit=limit, order=order)
     return payload
+

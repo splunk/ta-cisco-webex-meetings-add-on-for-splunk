@@ -46,3 +46,4 @@ authentication_type = {
     "OAuth" : "webExAccessToken",
     "SAML SSO" : "sessionTicket"
     }
+
