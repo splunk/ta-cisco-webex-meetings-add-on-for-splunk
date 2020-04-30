@@ -8,7 +8,7 @@
 [![Add-on Builder](https://img.shields.io/badge/built%20with-AoB%20/%20Python3-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
 
 ## Getting Started
-This is a TA to pull in data from WebEx Meetings XML API.
+This is a TA to pull in data from Cisco WebEx Meetings XML API.
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings.
 
 | XML API                   | Sourcetype                                          | Splunk Time Field | Type            | Recommended Interval |
@@ -26,9 +26,9 @@ These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-g
 
 #### Create a Service Account
 
-Create the service account in **Webex Meetings site's admin portal** (CompanyXYZ.webex.com).  Attached is the sample Screenshots.  Once the API user was created it was linked to the Control Hub because we have linked sites.
+Create the service account in **Webex Meetings site's admin portal** (CompanyXYZ.webex.com).    Once the API user was created it was linked to the Control Hub because we have linked sites.
 
-Based on which Webex you have, the account creation might be different.
+Based on which Cisco Webex Meetings you have, the account creation might be different.
 
 If you have to go to admin.webex.com (Control Hub) to login and manage your webex account, you may run into some issues.  Generally, Webex Teams and Webex Meetings portal are completely automated from Active directory connector and adding a **local user** is **DISABLED** as soon as AD connector is set up.
 
@@ -37,8 +37,6 @@ If you do not have any automation enabled, you should be able to create a user, 
 If you are managing the site from **Control Hub**, please take a look at this link it should help.
 
 Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.webex.com/en-us/v71ztb/Add-Users-Manually-in-Cisco-Webex-Control-Hub ) can also be a workaround if you have AD Connector setup as well.
-
-<img src="appserver/static/img/Add%20User.png"  width="600" height="450">
 
 
 #### Installation and Configuration Steps
@@ -86,7 +84,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 
 ## Versions Supported
 
-  - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on WebEx Meetings test account.
+  - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on Cisco WebEx Meetings test account.
 
 
 > Built by Splunk's FDSE Team (#team-fdse).
