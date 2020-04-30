@@ -5,7 +5,7 @@
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
 [![GitHub All Releases](https://img.shields.io/github/downloads/splunk/ta-webex-meetings-add-on-for-splunk/total?label=download&logo=github&style=flat-square&color=important)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
-[![Add-on Builder](https://img.shields.io/badge/built%20with-%20Python%203-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
+[![Add-on Builder](https://img.shields.io/badge/built%20with-Python3-ff69b4.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Whatsnew)
 [![ThirdPartyCredits](https://img.shields.io/badge/Thirdparty%20Credits-Addon%20Builder-purple.svg)](https://docs.splunk.com/Documentation/AddonBuilder/3.0.1/UserGuide/Thirdpartysoftwarecredits)
 
 
@@ -28,9 +28,9 @@ These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-g
 
 #### Create a Service Account
 
-Create the service account in **Webex Meetings site's admin portal** (CompanyXYZ.webex.com).  Attached is the sample Screenshots.  Once the API user was created it was linked to the Control Hub because we have linked sites.
+Create the service account in **Webex Meetings site's admin portal** (CompanyXYZ.webex.com).    Once the API user was created it was linked to the Control Hub because we have linked sites.
 
-Based on which Webex you have, the account creation might be different.
+Based on which Cisco Webex Meetings you have, the account creation might be different.
 
 If you have to go to admin.webex.com (Control Hub) to login and manage your webex account, you may run into some issues.  Generally, Webex Teams and Webex Meetings portal are completely automated from Active directory connector and adding a **local user** is **DISABLED** as soon as AD connector is set up.
 
@@ -84,7 +84,25 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
 - Click on the `Add` green button on the bottom right of the pop up box.
 
+## Versions Supported
+
+  - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on Cisco WebEx Meetings test account.
 
 
-## Credits & Acknowledgements (optional)
-> Built by Splunk's FDSE Team (#team-fdse). 
+> Built by Splunk's FDSE Team (#team-fdse).
+
+
+## Credits & Acknowledgements
+
+* Yuan Ling
+* Joe Welsh
+* Ankit Bhagat
+* Sandeep Vasani
+* Steven Hanna
+* Mayur Pipaliya
+
+## EOF :checkered_flag:
+
+* Want to **contribute**? Great! Feel free to create a [PR](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/pulls).
+
+* **Found a :bug: bug?** [Open an issue](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/issues/new) with some [emojis](http://emoji.muan.co). Issues without emojis are not valid. :trollface:
