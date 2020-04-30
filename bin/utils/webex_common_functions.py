@@ -3,16 +3,20 @@ import sys
 import time
 import datetime
 import requests
-import xml.etree.ElementTree as ET
-from io import StringIO
 from collections import defaultdict
-from xml.etree import cElementTree as ETree
 import json
 from datetime import date, timedelta
 from datetime import datetime
+try:
+    from defusedxml1 import ElementTree as ET
+except:
+    # Splunk <=7.2.9 does not ship with defusedxml
+    from dep.defusedxml import ElementTree as ET
+from io import StringIO
 
-from webex_constant import tag_map, sourcetype_map, timestamp_map, start_time_map
-from xml_payload_format import xml_format
+
+from utils.webex_constant import tag_map, sourcetype_map, timestamp_map, start_time_map
+from utils.xml_payload_format import xml_format
 
 
 def fetch_webex_logs(ew, helper, params):

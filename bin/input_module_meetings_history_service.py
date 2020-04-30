@@ -6,16 +6,11 @@ import sys
 import time
 import datetime
 import requests
-import xml.etree.ElementTree as ET
-from io import StringIO
-from collections import defaultdict
-from xml.etree import cElementTree as ETree
-import json
 from datetime import date, timedelta
 from datetime import datetime
 
-from webex_constant import authentication_type
-from webex_common_functions import fetch_webex_logs
+from utils.webex_constant import authentication_type
+from utils.webex_common_functions import fetch_webex_logs
 
 
 def validate_input(helper, definition):
