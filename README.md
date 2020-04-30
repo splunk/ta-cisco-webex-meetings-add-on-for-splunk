@@ -1,6 +1,6 @@
-# Splunk-TA for WebEx Meetings
+# Cisco WebEx Meetings Add-on for Splunk
 
-> The **Splunk-TA for Webex Meetings** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
+> The **Cisco WebEx Meetings Add-on for Splunk** uses the _Webex Meetings XML API_ to fetch data and ingest it into Splunk.
 
 [![HitCount](http://hits.dwyl.com/splunk/ta-webex-meetings-add-on-for-splunk.svg)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/releases)
 [![GitHub issues](https://img.shields.io/github/issues/splunk/ta-webex-meetings-add-on-for-splunk?label=issues&color=informational)](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues)
@@ -84,25 +84,12 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
 - Click on the `Add` green button on the bottom right of the pop up box.
 
-## Example(s)
+## Versions Supported
 
-## Global Setting
-<img src="appserver/static/img/global_setting.png"  width="600" height="450">
-
-### Input type: Scheduled Active Session 
-
-<img src="appserver/static/img/general_service_1.png"  width="1500" height="150">
-<img src="appserver/static/img/general_service_2.png"  width="600" height="450">
-
-### Input type: Historical Meetings
-
-<img src="appserver/static/img/history_service_1.png"  width="1500" height="150">
-<img src="appserver/static/img/history_service_2.png"  width="600" height="450">
+  - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on WebEx Meetings test account.
 
 
-
-
-> Built by Splunk's FDSE Team (#team-fdse). 
+> Built by Splunk's FDSE Team (#team-fdse).
 
 
 ## Credits & Acknowledgements
@@ -116,6 +103,6 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 
 ## EOF :checkered_flag:
 
-* Want to **contribute**? Great! Feel free to create a [PR](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/pulls).
+* Want to **contribute**? Great! Feel free to create a [PR](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/pulls).
 
-* **Found a :bug: bug?** [Open an issue](https://github.com/splunk/ta-webex-meetings-add-on-for-splunk/issues/new) with some [emojis](http://emoji.muan.co). Issues without emojis are not valid. :trollface:
+* **Found a :bug: bug?** [Open an issue](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/issues/new) with some [emojis](http://emoji.muan.co). Issues without emojis are not valid. :trollface:
