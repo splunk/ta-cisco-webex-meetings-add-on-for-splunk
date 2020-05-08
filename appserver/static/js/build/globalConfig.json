@@ -129,14 +129,6 @@
                                     {
                                         "label": "http",
                                         "value": "http"
-                                    },
-                                    {
-                                        "label": "socks4",
-                                        "value": "socks4"
-                                    },
-                                    {
-                                        "label": "socks5",
-                                        "value": "socks5"
                                     }
                                 ]
                             },

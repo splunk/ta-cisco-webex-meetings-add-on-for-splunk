@@ -56,12 +56,20 @@ def collect_events(helper, ew):
     opt_interval = int(helper.get_arg('interval'))
     opt_live = helper.get_arg('live')
 
+    proxy_settings = helper.get_proxy()
+    proxy_auth = "{}:{}".format(proxy_settings['proxy_username'], proxy_settings['proxy_password'])
+    proxies = {
+        "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy_settings['proxy_type'], auth=proxy_auth, host=proxy_settings['proxy_url'], port=proxy_settings['proxy_port']),
+        "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy_settings['proxy_type'], auth=proxy_auth, host=proxy_settings['proxy_url'], port=proxy_settings['proxy_port'])
+    }
+
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),
               "opt_site_name": helper.get_global_setting("site_name"),
               "limit": 500,
               "timezone": "20",
-              "password_type": authentication_type["Password Authentication"]}
+              "password_type": authentication_type["Password Authentication"],
+              "proxies": proxies }
 
     # if opt_live is True:
     # do the time magic
@@ -164,7 +172,7 @@ def fetch_webex_logs(ew, helper, params):
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
 
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload, param['proxies'])
         helper.log_debug(
             "[-] : response.status_code: {}".format(response.status_code))
         if response.status_code != 200:

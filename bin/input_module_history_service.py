@@ -35,6 +35,13 @@ def validate_input(helper, definition):
     start_time_start = definition.parameters.get('start_time_start', None)
     interval = definition.parameters.get('interval', None)
 
+    proxy_settings = helper.get_proxy()
+    proxy_auth = "{}:{}".format(proxy_settings['proxy_username'], proxy_settings['proxy_password'])
+    proxies = {
+        "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy_settings['proxy_type'], auth=proxy_auth, host=proxy_settings['proxy_url'], port=proxy_settings['proxy_port']),
+        "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy_settings['proxy_type'], auth=proxy_auth, host=proxy_settings['proxy_url'], port=proxy_settings['proxy_port'])
+    }
+
     if int(interval) < 86400:
         raise ValueError(
             "Interval should be 86400 or more for historical data, not {}.".format(interval))
@@ -148,7 +155,7 @@ def fetch_webex_logs(ew, helper, params):
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
 
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload, params['proxies'])
         helper.log_debug(
             "[-] : response.status_code: {}".format(response.status_code))
         if response.status_code != 200:
