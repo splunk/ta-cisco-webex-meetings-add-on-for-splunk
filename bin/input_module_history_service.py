@@ -72,12 +72,16 @@ def collect_events(helper, ew):
     opt_live = False
 
     proxy = helper.get_proxy()
-    proxy_auth = "{}:{}".format(
-        proxy['proxy_username'], proxy['proxy_password'])
-    proxies = {
-        "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
-        "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
-    }
+    helper.log_debug("proxy: {}".format(proxy))
+    if proxy:
+        proxy_auth = "{}:{}".format(
+            proxy['proxy_username'], proxy['proxy_password'])
+        proxies = {
+            "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
+            "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
+        }
+    else:
+        proxies = None
 
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),

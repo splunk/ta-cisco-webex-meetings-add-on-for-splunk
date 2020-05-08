@@ -25,6 +25,7 @@ from datetime import datetime
 from xml_payload_format import xml_format
 from webex_constant import tag_map, sourcetype_map, timestamp_map, start_time_map, authentication_type
 
+
 def validate_input(helper, definition):
     """Implement your own validation logic to validate the input stanza configurations"""
     # This example accesses the modular input variable
@@ -57,11 +58,16 @@ def collect_events(helper, ew):
     opt_live = helper.get_arg('live')
 
     proxy = helper.get_proxy()
-    proxy_auth = "{}:{}".format(proxy['proxy_username'], proxy['proxy_password'])
-    proxies = {
-        "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
-        "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
-    }
+    helper.log_debug("proxy: {}".format(proxy))
+    if proxy:
+        proxy_auth = "{}:{}".format(
+            proxy['proxy_username'], proxy['proxy_password'])
+        proxies = {
+            "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
+            "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
+        }
+    else:
+        proxies = None
 
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),
@@ -69,7 +75,7 @@ def collect_events(helper, ew):
               "limit": 500,
               "timezone": "20",
               "password_type": authentication_type["Password Authentication"],
-              "proxies": proxies }
+              "proxies": proxies}
 
     # if opt_live is True:
     # do the time magic
@@ -172,7 +178,8 @@ def fetch_webex_logs(ew, helper, params):
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
 
     try:
-        response = requests.request("POST", url, headers=headers, data=payload, proxies=params['proxies'])
+        response = requests.request(
+            "POST", url, headers=headers, data=payload, proxies=params['proxies'])
         helper.log_debug(
             "[-] : response.status_code: {}".format(response.status_code))
         if response.status_code != 200:
@@ -317,4 +324,3 @@ def parse_xml_to_dict(xml_string):
             el.tag = postfix  # strip all namespaces
     root = it.root
     return etree_to_dict(root)
-
