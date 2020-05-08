@@ -72,7 +72,6 @@ def collect_events(helper, ew):
     opt_live = False
 
     proxy = helper.get_proxy()
-    helper.log_debug("proxy: {}".format(proxy))
     if proxy:
         proxy_auth = "{}:{}".format(
             proxy['proxy_username'], proxy['proxy_password'])
