@@ -93,6 +93,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
   - **Port** (_required_) : Proxy Port.
   - **Username** : Proxy Username.
   - **Password** : Proxy Password.
+  - **Remote DNS resolution** : Checkbox for enabling remote DNS resolution.
 - Click on the `Save` green button.
 
 ## Versions Supported
