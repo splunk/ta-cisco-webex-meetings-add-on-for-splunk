@@ -83,6 +83,18 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
     - **Endpoints** (_required_): Historical endpoints that are used to fetch historical data back.
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
 - Click on the `Add` green button on the bottom right of the pop up box.
+6. Set Proxy Setting (optional)
+ - Click on `Configuration` button on the top left corner.
+- Click on `Proxy` button.
+- Enter the following details:
+  - **Enable** (_required_) : Check `Enable` box if you want to enable proxy support
+  - **Proxy Type** (_required_) : Select a Proxy Type: `http`, `socks4`, `socks5`.
+  - **Host** (_required_) : Proxy URL.
+  - **Port** (_required_) : Proxy Port.
+  - **Username** : Proxy Username.
+  - **Password** : Proxy Password.
+  - **Remote DNS resolution** : Checkbox for enabling remote DNS resolution.
+- Click on the `Save` green button.
 
 ## Versions Supported
 

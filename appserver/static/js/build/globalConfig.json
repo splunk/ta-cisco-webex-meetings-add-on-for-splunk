@@ -2,7 +2,7 @@
     "meta": {
         "name": "ta-cisco-webex-meetings-add-on-for-splunk",
         "displayName": "Cisco WebEx Meetings Add-on for Splunk",
-        "version": "1.1.1",
+        "version": "1.1.2",
         "apiVersion": "3.0.0",
         "restRoot": "ta_cisco_webex_meetings_add_on_for_splunk"
     },
@@ -10,12 +10,99 @@
         "configuration": {
             "title": "Configuration",
             "description": "Set up your add-on",
-            "tabs": [
+            "tabs": [{
+                    "name": "additional_parameters",
+                    "title": "Add-on Settings",
+                    "entity": [{
+                            "field": "site_name",
+                            "label": "Site Name",
+                            "type": "text",
+                            "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://mysitename.webex.com specify mysitename",
+                            "required": true,
+                            "defaultValue": "",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "mysitename"
+                            }
+                        },
+                        {
+                            "field": "username",
+                            "label": "Username",
+                            "type": "text",
+                            "help": "Service Account Username or Email address of the host or admin account making a request.",
+                            "required": true,
+                            "defaultValue": "",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "localuser or user@example.com"
+                            }
+                        },
+                        {
+                            "field": "password",
+                            "label": "Password",
+                            "type": "text",
+                            "help": "Service Account Password",
+                            "required": true,
+                            "defaultValue": "*  *  *",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        }
+                    ]
+                },
+
+                {
+                    "name": "logging",
+                    "title": "Logging",
+                    "entity": [{
+                        "field": "loglevel",
+                        "label": "Log level",
+                        "type": "singleSelect",
+                        "options": {
+                            "disableSearch": true,
+                            "autoCompleteFields": [{
+                                    "label": "DEBUG",
+                                    "value": "DEBUG"
+                                },
+                                {
+                                    "label": "INFO",
+                                    "value": "INFO"
+                                },
+                                {
+                                    "label": "WARNING",
+                                    "value": "WARNING"
+                                },
+                                {
+                                    "label": "ERROR",
+                                    "value": "ERROR"
+                                },
+                                {
+                                    "label": "CRITICAL",
+                                    "value": "CRITICAL"
+                                }
+                            ]
+                        },
+                        "defaultValue": "INFO"
+                    }]
+                },
                 {
                     "name": "proxy",
                     "title": "Proxy",
-                    "entity": [
-                        {
+                    "entity": [{
                             "field": "proxy_enabled",
                             "label": "Enable",
                             "type": "checkbox"
@@ -26,8 +113,7 @@
                             "type": "singleSelect",
                             "options": {
                                 "disableSearch": true,
-                                "autoCompleteFields": [
-                                    {
+                                "autoCompleteFields": [{
                                         "label": "http",
                                         "value": "http"
                                     },
@@ -47,55 +133,47 @@
                             "field": "proxy_url",
                             "label": "Host",
                             "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 4096,
-                                    "errorMsg": "Max host length is 4096"
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 4096,
+                                "errorMsg": "Max host length is 4096"
+                            }]
                         },
                         {
                             "field": "proxy_port",
                             "label": "Port",
                             "type": "text",
-                            "validators": [
-                                {
-                                    "type": "number",
-                                    "range": [
-                                        1,
-                                        65535
-                                    ]
-                                }
-                            ]
+                            "validators": [{
+                                "type": "number",
+                                "range": [
+                                    1,
+                                    65535
+                                ]
+                            }]
                         },
                         {
                             "field": "proxy_username",
                             "label": "Username",
                             "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 50,
-                                    "errorMsg": "Max length of username is 50"
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 50,
+                                "errorMsg": "Max length of username is 50"
+                            }]
                         },
                         {
                             "field": "proxy_password",
                             "label": "Password",
                             "type": "text",
                             "encrypted": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of password is 8192"
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
                         },
                         {
                             "field": "proxy_rdns",
@@ -106,104 +184,6 @@
                     "options": {
                         "saveValidator": "function(formData) { if(!formData.proxy_enabled || formData.proxy_enabled === '0') {return true; } if(!formData.proxy_url) { return 'Proxy Host can not be empty'; } if(!formData.proxy_port) { return 'Proxy Port can not be empty'; } return true; }"
                     }
-                },
-                {
-                    "name": "logging",
-                    "title": "Logging",
-                    "entity": [
-                        {
-                            "field": "loglevel",
-                            "label": "Log level",
-                            "type": "singleSelect",
-                            "options": {
-                                "disableSearch": true,
-                                "autoCompleteFields": [
-                                    {
-                                        "label": "DEBUG",
-                                        "value": "DEBUG"
-                                    },
-                                    {
-                                        "label": "INFO",
-                                        "value": "INFO"
-                                    },
-                                    {
-                                        "label": "WARNING",
-                                        "value": "WARNING"
-                                    },
-                                    {
-                                        "label": "ERROR",
-                                        "value": "ERROR"
-                                    },
-                                    {
-                                        "label": "CRITICAL",
-                                        "value": "CRITICAL"
-                                    }
-                                ]
-                            },
-                            "defaultValue": "INFO"
-                        }
-                    ]
-                },
-                {
-                    "name": "additional_parameters",
-                    "title": "Add-on Settings",
-                    "entity": [
-                        {
-                            "field": "site_name",
-                            "label": "Site Name",
-                            "type": "text",
-                            "help": "This identifies the Webex site you are targeting with your API request. Site name is the subdomain of the Webex site URL.For example, for https://mysitename.webex.com specify mysitename",
-                            "required": true,
-                            "defaultValue": "",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
-                            "options": {
-                                "placeholder": "mysitename"
-                            }
-                        },
-                        {
-                            "field": "username",
-                            "label": "Username",
-                            "type": "text",
-                            "help": "Service Account Username or Email address of the host or admin account making a request.",
-                            "required": true,
-                            "defaultValue": "",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
-                            "options": {
-                                "placeholder": "localuser or user@example.com"
-                            }
-                        },
-                        {
-                            "field": "password",
-                            "label": "Password",
-                            "type": "text",
-                            "help": "Service Account Password",
-                            "required": true,
-                            "defaultValue": "*  *  *",
-                            "encrypted": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of password is 8192"
-                                }
-                            ]
-                        }
-                    ]
                 }
             ]
         },
@@ -211,8 +191,7 @@
             "title": "Inputs",
             "description": "Manage your data inputs",
             "table": {
-                "header": [
-                    {
+                "header": [{
                         "field": "name",
                         "label": "Name"
                     },
@@ -229,8 +208,7 @@
                         "label": "Status"
                     }
                 ],
-                "moreInfo": [
-                    {
+                "moreInfo": [{
                         "field": "name",
                         "label": "Name"
                     },
@@ -266,19 +244,16 @@
                     "clone"
                 ]
             },
-            "services": [
-                {
+            "services": [{
                     "name": "general_service",
                     "title": "General Service",
-                    "entity": [
-                        {
+                    "entity": [{
                             "field": "name",
                             "label": "Name",
                             "type": "text",
                             "help": "Enter a unique name for the data input",
                             "required": true,
-                            "validators": [
-                                {
+                            "validators": [{
                                     "type": "regex",
                                     "pattern": "^[a-zA-Z]\\w*$",
                                     "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
@@ -296,14 +271,13 @@
                             "label": "Interval",
                             "type": "text",
                             "required": true,
-                            "help": "Time interval of input in seconds.",
-                            "validators": [
-                                {
-                                    "type": "regex",
-                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
-                                    "errorMsg": "Interval must be an integer."
-                                }
-                            ]
+                            "defaultValue": "60",
+                            "help": "Time interval of input in seconds. 60 seconds or less.",
+                            "validators": [{
+                                "type": "regex",
+                                "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                "errorMsg": "Interval must be an integer."
+                            }]
                         },
                         {
                             "field": "index",
@@ -316,14 +290,12 @@
                                 "createSearchChoice": true
                             },
                             "required": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 80,
-                                    "errorMsg": "Length of index name should be between 1 and 80."
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80,
+                                "errorMsg": "Length of index name should be between 1 and 80."
+                            }]
                         },
                         {
                             "field": "live",
@@ -338,15 +310,13 @@
                 {
                     "name": "history_service",
                     "title": "History Service",
-                    "entity": [
-                        {
+                    "entity": [{
                             "field": "name",
                             "label": "Name",
                             "type": "text",
                             "help": "Enter a unique name for the data input",
                             "required": true,
-                            "validators": [
-                                {
+                            "validators": [{
                                     "type": "regex",
                                     "pattern": "^[a-zA-Z]\\w*$",
                                     "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
@@ -364,14 +334,13 @@
                             "label": "Interval",
                             "type": "text",
                             "required": true,
-                            "help": "Time interval of input in seconds.",
-                            "validators": [
-                                {
-                                    "type": "regex",
-                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
-                                    "errorMsg": "Interval must be an integer."
-                                }
-                            ]
+                            "defaultValue": "86400",
+                            "help": "Time interval of input in seconds. 86400 seconds or more.",
+                            "validators": [{
+                                "type": "regex",
+                                "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                "errorMsg": "Interval must be an integer."
+                            }]
                         },
                         {
                             "field": "index",
@@ -384,14 +353,12 @@
                                 "createSearchChoice": true
                             },
                             "required": true,
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 80,
-                                    "errorMsg": "Length of index name should be between 1 and 80."
-                                }
-                            ]
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80,
+                                "errorMsg": "Length of index name should be between 1 and 80."
+                            }]
                         },
                         {
                             "field": "endpoints",
@@ -401,8 +368,7 @@
                             "type": "multipleSelect",
                             "options": {
                                 "delimiter": "~",
-                                "items": [
-                                    {
+                                "items": [{
                                         "value": "LstmeetingusageHistory",
                                         "label": "Meeting Usage"
                                     },
@@ -435,14 +401,12 @@
                             "help": "This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
                             "required": true,
                             "type": "text",
-                            "validators": [
-                                {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 8192,
-                                    "errorMsg": "Max length of text input is 8192"
-                                }
-                            ],
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
                             "options": {
                                 "placeholder": "04/01/2020 00:00:00"
                             }

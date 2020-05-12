@@ -47,6 +47,13 @@ def validate_input(helper, definition):
     except ValueError:
         raise ValueError(
             "Incorrect data format, time should be MM/DD/YYYY hh:mm:ss")
+
+    enddt = datetime.utcnow().date() - timedelta(3)
+    end_time = datetime.combine(enddt, datetime.max.time())
+    start_time_start = datetime.strptime(start_time_start, '%m/%d/%Y %H:%M:%S')
+    if start_time_start >= end_time:
+        raise ValueError(
+            "Begin Date must be at least 3 days ago. Please enter a time before {}.".format(end_time.strftime('%m/%d/%Y %H:%M:%S')))
     pass
 
 
@@ -64,12 +71,24 @@ def collect_events(helper, ew):
     opt_interval = int(helper.get_arg('interval'))
     opt_live = False
 
+    proxy = helper.get_proxy()
+    if proxy:
+        proxy_auth = "{}:{}".format(
+            proxy['proxy_username'], proxy['proxy_password'])
+        proxies = {
+            "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
+            "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
+        }
+    else:
+        proxies = None
+
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),
               "opt_site_name": helper.get_global_setting("site_name"),
               "limit": 500,
               "timezone": "20",
-              "password_type": authentication_type["Password Authentication"]}
+              "password_type": authentication_type["Password Authentication"],
+              "proxies": proxies}
 
     # Historical Data
     helper.log_debug("Historical Data")
@@ -148,7 +167,8 @@ def fetch_webex_logs(ew, helper, params):
         "[-] Debug Fetch Request: {} - {}".format(params['offset'], params['limit']))
 
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request(
+            "POST", url, headers=headers, data=payload, proxies=params['proxies'])
         helper.log_debug(
             "[-] : response.status_code: {}".format(response.status_code))
         if response.status_code != 200:
@@ -293,4 +313,3 @@ def parse_xml_to_dict(xml_string):
             el.tag = postfix  # strip all namespaces
     root = it.root
     return etree_to_dict(root)
-
