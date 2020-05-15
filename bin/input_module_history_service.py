@@ -81,13 +81,17 @@ def collect_events(helper, ew):
         }
     else:
         proxies = None
+    
+  
+    helper.log_debug("[-] webex password_type: {}".format(helper.get_global_setting("password_type")))
 
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),
               "opt_site_name": helper.get_global_setting("site_name"),
               "limit": 500,
               "timezone": "20",
-              "password_type": authentication_type["Password Authentication"],
+              #"password_type": authentication_type["Password Authentication"],
+              "password_type": helper.get_global_setting("password_type"),
               "proxies": proxies}
 
     # Historical Data

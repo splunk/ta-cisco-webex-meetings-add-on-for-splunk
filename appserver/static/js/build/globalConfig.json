@@ -61,6 +61,30 @@
                                 "maxLength": 8192,
                                 "errorMsg": "Max length of password is 8192"
                             }]
+                        },
+                        {
+                            "field": "password_type",
+                            "label": "Authentication Type",
+                            "help": "Please choose an Authenticatoin Type",
+                            "required": true,
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [{
+                                        "value": "password",
+                                        "label": "Basic Password Auth"
+                                    },
+                                    {
+                                        "value": "webExAccessToken",
+                                        "label": "OAuth (alpha/test)"
+                                    },
+                                    {
+                                        "value": "sessionTicket",
+                                        "label": "SAML Ticket  (alpha/test)"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "password"
                         }
                     ]
                 },

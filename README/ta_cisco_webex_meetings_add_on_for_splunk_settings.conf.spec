@@ -14,3 +14,4 @@ loglevel =
 site_name = 
 username = 
 password = 
+password_type =

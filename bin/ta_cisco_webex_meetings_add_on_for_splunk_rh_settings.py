@@ -121,6 +121,16 @@ fields_additional_parameters = [
             min_len=0, 
             max_len=8192, 
         )
+    ),
+    field.RestField(
+        'password_type',
+        required=True,
+        encrypted=False,
+        default='password',
+        validator=validator.String(
+            min_len=0, 
+            max_len=50, 
+        )
     )
 ]
 model_additional_parameters = RestModel(fields_additional_parameters, name='additional_parameters')
