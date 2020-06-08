@@ -39,7 +39,7 @@ def xml_format(params):
                             <sessionEndTimeEnd>{end_time}</sessionEndTimeEnd>
                         </endTimeScope>
         '''.format(start_time=start_time, end_time=end_time)
-    elif endpoint == "LstmeetingattendeeHistory":
+    elif endpoint == "LstmeetingattendeeHistory" or endpoint == "LsteventattendeeHistory" or endpoint == "LstsupportattendeeHistory" or endpoint == "LsttrainingattendeeHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
         TimeScope = '''
@@ -93,4 +93,3 @@ def xml_format(params):
         </body>
     </serv:message>""".format(auth=auth, endpoint=endpoint, TimeScope=TimeScope, offset=offset, limit=limit, order=order)
     return payload
-

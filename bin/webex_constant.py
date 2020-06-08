@@ -5,7 +5,10 @@ tag_map = {
     "LstrecordaccessHistory": "recordAccessHistory",
     "LstsupportsessionHistory": "supportSessionHistory",
     "LsttrainingsessionHistory": "trainingSessionHistory",
-    "LstsummarySession": "session"
+    "LstsummarySession": "session",
+    "LsteventattendeeHistory": "eventAttendeeHistory",
+    "LstsupportattendeeHistory": "supportAttendeeHistory",
+    "LsttrainingattendeeHistory": "trainingAttendeeHistory"
 }
 
 sourcetype_map = {
@@ -15,7 +18,10 @@ sourcetype_map = {
     "LstrecordaccessHistory": "cisco:webex:meetings:history:recordaccesshistory",
     "LstsupportsessionHistory": "cisco:webex:meetings:history:supportsessionhistory",
     "LsttrainingsessionHistory": "cisco:webex:meetings:history:trainingsessionhistory",
-    "LstsummarySession": "cisco:webex:meetings:general:summarysession"
+    "LstsummarySession": "cisco:webex:meetings:general:summarysession",
+    "LsteventattendeeHistory": "cisco:webex:meetings:history:eventattendeehistory",
+    "LstsupportattendeeHistory": "cisco:webex:meetings:history:supportattendeehistory",
+    "LsttrainingattendeeHistory": "cisco:webex:meetings:history:trainingattendeehistory"
 }
 
 # End time tag map: use this for timestamp checkpoint
@@ -26,7 +32,10 @@ timestamp_map = {
     "LstrecordaccessHistory": "creationTime",
     "LstsupportsessionHistory": "sessionEndTime",
     "LsttrainingsessionHistory": "sessionEndTime",
-    "LstsummarySession": "actualStartTime"
+    "LstsummarySession": "actualStartTime",
+    "LsteventattendeeHistory": "endTime",
+    "LstsupportattendeeHistory": "endTime",
+    "LsttrainingattendeeHistory": "endTime"
 }
 
 # Start time tag map: use this for time extration
@@ -37,13 +46,15 @@ start_time_map = {
     "LstrecordaccessHistory": "creationTime",
     "LstsupportsessionHistory": "sessionStartTime",
     "LsttrainingsessionHistory": "sessionStartTime",
-    "LstsummarySession": "actualStartTime"
+    "LstsummarySession": "actualStartTime",
+    "LsteventattendeeHistory": "startTime",
+    "LstsupportattendeeHistory": "startTime",
+    "LsttrainingattendeeHistory": "startTime"
 }
 
 # webExAccessToken
 authentication_type = {
-    "Password Authentication" : "password",
-    "OAuth" : "webExAccessToken",
-    "SAML SSO" : "sessionTicket"
-    }
-
+    "Password Authentication": "password",
+    "OAuth": "webExAccessToken",
+    "SAML SSO": "sessionTicket"
+}

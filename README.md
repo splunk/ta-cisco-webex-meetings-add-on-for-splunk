@@ -13,15 +13,18 @@
 This is a TA to pull in data from Cisco WebEx Meetings XML API.
 These [API endpoints](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory) are being hit to fetch data for the meetings.
 
-| XML API                   | Sourcetype                                          | Splunk Time Field | Type            | Recommended Interval |
-|---------------------------|-----------------------------------------------------|-------------------|-----------------|----------------------|
-| [LstmeetingattendeeHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingattendeehistory) | cisco:webex:meetings:history:meetingattendeehistory | joinTime          | Historical      | >= 86400             |
-| [LstmeetingusageHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstmeetingusagehistory)    | cisco:webex:meetings:history:meetingusagehistory    | meetingStartTime  | Historical      | >= 86400             |
-| [LsteventsessionHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lsteventsessionhistory)    | cisco:webex:meetings:history:eventsessionhistory    | sessionStartTime  | Historical      | >= 86400             |
-| [LstrecordaccessHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstrecordaccesshistory)    | cisco:webex:meetings:history:recordaccesshistory    | creationTime      | Historical      | >= 86400             |
-| [LstsupportsessionHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstsupportsessionhistory)  | cisco:webex:meetings:history:supportsessionhistory  | sessionStartTime  | Historical      | >= 86400             |
-| [LsttrainingsessionHistory](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lsttrainingsessionhistory) | cisco:webex:meetings:history:trainingsessionhistory | sessionStartTime  | Historical      | >= 86400             |
-| [LstsummarySession](https://developer.cisco.com/docs/webex-xml-api-reference-guide/#!lstsummarysession)         | cisco:webex:meetings:general:summarysession         | actualStartTime   | Active Sessions | <= 60                |
+| XML API                    | Sourcetype                                           | Splunk Time Field | Type            | Recommended Interval |
+|----------------------------|------------------------------------------------------|-------------------|-----------------|----------------------|
+| LsttrainingattendeeHistory | cisco:webex:meetings:history:trainingattendeehistory | startTime         | Historical      | >= 86400             |
+| LstsupportattendeeHistory  | cisco:webex:meetings:history:supportattendeehistory  | startTime         | Historical      | >= 86400             |
+| LsteventattendeeHistory    | cisco:webex:meetings:history:eventattendeehistory    | startTime         | Historical      | >= 86400             |
+| LstmeetingattendeeHistory  | cisco:webex:meetings:history:meetingattendeehistory  | joinTime          | Historical      | >= 86400             |
+| LstmeetingusageHistory     | cisco:webex:meetings:history:meetingusagehistory     | meetingStartTime  | Historical      | >= 86400             |
+| LsteventsessionHistory     | cisco:webex:meetings:history:eventsessionhistory     | sessionStartTime  | Historical      | >= 86400             |
+| LstrecordaccessHistory     | cisco:webex:meetings:history:recordaccesshistory     | creationTime      | Historical      | >= 86400             |
+| LstsupportsessionHistory   | cisco:webex:meetings:history:supportsessionhistory   | sessionStartTime  | Historical      | >= 86400             |
+| LsttrainingsessionHistory  | cisco:webex:meetings:history:trainingsessionhistory  | sessionStartTime  | Historical      | >= 86400             |
+| LstsummarySession          | cisco:webex:meetings:general:summarysession          | actualStartTime   | Active Sessions | <= 60                |
 
 
 **DISCLAIMER**: Guidance from Cisco states historical data retrieval may be incomplete if fetched less than 48 hours from time meetings ended. Therefore it's recommended to set the interval to 86400 or more for historical input.

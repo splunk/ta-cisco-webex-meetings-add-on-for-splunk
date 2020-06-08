@@ -47,7 +47,7 @@ class Event(object):
     '''
 
     def __init__(self, data, time=None,
-                 index=None, host=None, source=None, sourcetype=None,
+                 index=None, host=None, source=None, sourcetype=None, fields=None,
                  stanza=None, unbroken=False, done=False):
         '''Modular input event.
 
@@ -64,6 +64,8 @@ class Event(object):
         :type source: ``string``
         :param sourcetype: (optional) Event sourcetype, default is None.
         :type sourcetype: ``string``
+        :param fields: (optional) Event fields, default is None.
+        :type fields: ``json object``
         :param stanza: (optional) Event stanza name, default is None.
         :type stanza: ``string``
         :param unbroken: (optional) Event unbroken flag, default is False.
@@ -79,6 +81,7 @@ class Event(object):
            >>>     host='localhost',
            >>>     source='Splunk',
            >>>     sourcetype='misc',
+           >>>     fields= {'Cloud':'AWS','region': 'us-west-1'}
            >>>     stanza='test_scheme://test',
            >>>     unbroken=True,
            >>>     done=True)
@@ -90,6 +93,8 @@ class Event(object):
         self._host = host
         self._source = source
         self._sourcetype = sourcetype
+        if fields:
+            self._fields = fields
         self._stanza = stanza
         if not unbroken and done:
             raise EventException(
@@ -98,7 +103,7 @@ class Event(object):
         self._done = done
 
     def __str__(self):
-        return json.dumps({
+        event = {
             'data': self._data,
             'time': float(self._time) if self._time else self._time,
             'index': self._index,
@@ -108,7 +113,12 @@ class Event(object):
             'stanza': self._stanza,
             'unbroken': self._unbroken,
             'done': self._done
-        })
+        }
+
+        if hasattr(self, '_fields'):
+            event['fields'] = self._fields
+        
+        return json.dumps(event)
 
     @classmethod
     def format_events(cls, events):
@@ -193,9 +203,9 @@ class HECEvent(Event):
 
     max_hec_event_length = 1000000
 
-    def _to_hec(self):
+    def _to_hec(self, event_field):
         event = {}
-        event['event'] = self._data
+        event[event_field] = self._data
         if self._time:
             event['time'] = float(self._time)
         if self._index:
@@ -206,11 +216,13 @@ class HECEvent(Event):
             event['source'] = self._source
         if self._sourcetype:
             event['sourcetype'] = self._sourcetype
+        if hasattr(self, '_fields'):
+            event['fields'] = self._fields
 
         return json.dumps(event)
 
     @classmethod
-    def format_events(cls, events):
+    def format_events(cls, events, event_field='event'):
         '''Output: [
         '{"index": "main", ... "event": {"kk": [1, 2, 3]}}\\n
         {"index": "main", ... "event": {"kk": [3, 2, 3]}}',
@@ -219,7 +231,7 @@ class HECEvent(Event):
 
         size = 0
         new_events, batched_events = [], []
-        events = [event._to_hec() for event in events]
+        events = [event._to_hec(event_field) for event in events]
         for event in events:
             new_length = size + len(event) + len(batched_events) - 1
             if new_length >= cls.max_hec_event_length:
