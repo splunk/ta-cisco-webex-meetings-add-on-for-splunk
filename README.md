@@ -99,6 +99,11 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
   - **Remote DNS resolution** : Checkbox for enabling remote DNS resolution.
 - Click on the `Save` green button.
 
+
+## Troubleshooting 
+
+- [Check Conenctivity to WebEx API via shell/curl script](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/wiki/Troubleshooting).
+
 ## Versions Supported
 
   - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on Cisco WebEx Meetings test account.
