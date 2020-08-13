@@ -48,11 +48,76 @@
                             }
                         },
                         {
-                            "field": "password",
-                            "label": "Password",
-                            "type": "text",
-                            "help": "Service Account Password",
+                            "field": "password_type",
+                            "label": "Authentication Type",
+                            "help": "Please choose an Authenticatoin Type",
                             "required": true,
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [{
+                                        "value": "password",
+                                        "label": "Basic Password Auth"
+                                    },
+                                    {
+                                        "value": "webExAccessToken",
+                                        "label": "OAuth/SSO"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "password"
+                        },
+                        {
+                            "field": "client_id",
+                            "label": "Client Id",
+                            "type": "text",
+                            "help": "Client Id for WebEx Oauth Integration App",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "client_secret",
+                            "label": "Client Secret",
+                            "type": "text",
+                            "help": "Client Secret for WebEx Oauth Integration App",
+                            "required": false,
+                            "defaultValue": "*  *  *",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "password",
+                            "label": "Password / Access Token",
+                            "type": "text",
+                            "help": "Enter the Service Account Password or Generate the Access Token by clicking the below button",
+                            "required": true,
+                            "defaultValue": "*  *  *",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "refresh_token",
+                            "label": "Refresh Token",
+                            "type": "text",
+                            "help": "Enter the Refresh Token",
+                            "required": false,
                             "defaultValue": "*  *  *",
                             "encrypted": true,
                             "validators": [{
