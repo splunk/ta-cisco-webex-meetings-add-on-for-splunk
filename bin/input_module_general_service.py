@@ -12,6 +12,7 @@ from datetime import datetime
 
 from utils.webex_constant import authentication_type
 from utils.webex_common_functions import fetch_webex_logs
+from utils.access_token_functions import get_access_token_by_refresh_token, update_access_token, update_access_token_with_validation
 
 
 def validate_input(helper, definition):
@@ -58,6 +59,23 @@ def collect_events(helper, ew):
               "proxies": proxies}
 
     params.update({"opt_endpoint": "LstsummarySession"})
+
+    # Handle OAuth Situation
+    # if password_type is NOT password is override password by access token
+    helper.log_debug("password_type: {}".format(params['password_type']))
+    if params['password_type'] != "password":
+        params['opt_client_id'] = helper.get_global_setting("client_id")
+        params['opt_client_secret'] = helper.get_global_setting(
+            "client_secret")
+        params['opt_refresh_token'] = helper.get_global_setting(
+            "refresh_token")
+
+        # update_access_token(helper, params)
+        update_access_token_with_validation(helper, params)
+
+    # MUST REMOVE LATER
+    helper.log_debug(
+        "access_token_used: ++++++++ {}".format(params['opt_password']))
 
     timestamp_key = "timestamp_{}_{}_processing".format(
         helper.get_input_stanza_names(), params['opt_endpoint'])
