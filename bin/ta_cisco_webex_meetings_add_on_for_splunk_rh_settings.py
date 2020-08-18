@@ -113,10 +113,20 @@ fields_additional_parameters = [
         )
     ),
     field.RestField(
+        'hostname',
+        required=False,
+        encrypted=False,
+        default='',
+        validator=validator.String(
+            min_len=0,
+            max_len=8192,
+        )
+    ),
+    field.RestField(
         'client_id',
         required=False,
         encrypted=False,
-        default='*  *  *',
+        default='',
         validator=validator.String(
             min_len=0,
             max_len=8192,

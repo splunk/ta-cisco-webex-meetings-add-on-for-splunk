@@ -60,10 +60,12 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
         """
 
         request = json.loads(in_string)
-        # logging.debug('type of in_string: {}'.format(type(in_string)))
-        # logging.debug('in_string: {}'.format(in_string))
-        method = request['method'].encode('utf8')
-        # logging.debug('method: {}'.format(method))
+        logging.debug('type of request: {}'.format(type(request)))
+        # logging.debug('request: {}'.format(request))
+
+        method = request['method']
+        logging.debug('method: {}'.format(method))
+        logging.debug('type method: {}'.format(type(method)))
 
         if method == "POST":
             try:
@@ -71,74 +73,84 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 logging.debug(
                     'type of form_params: {}'.format(type(form_params)))
                 # logging.debug('form_params: {}'.format(form_params))
-                client_id = form_params.get("client_id", None).encode('utf8')
+
+                hostname = form_params.get("hostname", None)
+                client_id = form_params.get("client_id", None)
                 client_secret = form_params.get(
-                    "client_secret", None).encode('utf8')
+                    "client_secret", None)
+                # hostname = form_params.get("hostname", None).encode('utf8')
+                # client_id = form_params.get("client_id", None).encode('utf8')
+                # client_secret = form_params.get(
+                #     "client_secret", None).encode('utf8')
 
                 creds_data = {
+                    "hostname": hostname,
                     "client_id": client_id,
                     "client_secret": client_secret
                 }
+                # logging.debug('creds_data: {}'.format(creds_data))
                 write_to_file(json.dumps(creds_data))
+                logging.debug("Wrote to file")
             except Exception as e:
                 logging.debug("err: {}".format(e))
                 pass
             return {'payload': request, 'status': 200}
         elif method == "GET":
-            # read the creds from log
+            # read the creds from file
+            logging.debug("======Reading file...======")
             creds_dict = read_file()
 
             if creds_dict:
-                creds_dict = json.loads(creds_dict)
-                client_id = creds_dict.get("client_id", None).encode('utf8')
-                client_secret = creds_dict.get(
-                    "client_secret", None).encode('utf8')
+                try:
+                    creds_dict = json.loads(creds_dict)
+                    hostname = creds_dict.get("hostname", None)
+                    client_id = creds_dict.get("client_id", None)
+                    client_secret = creds_dict.get(
+                        "client_secret", None)
 
-                # get the code from request
-                query_params = flatten_query_params(request['query'])
-                logging.debug('query_params: {}'.format(query_params))
-                code = query_params['code']
-                code = code.encode('utf8')
+                    # get the code from request
+                    query_params = flatten_query_params(request['query'])
+                    # logging.debug('query_params: {}'.format(query_params))
+                    code = query_params['code']
+                    # code = code.encode('utf8')
 
-                redirect_uri = "http://localhost:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth"
-                url = "https://api.webex.com/v1/oauth2/token"
+                    redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+                        hostname)
+                    logging.debug("redirect_uri -- {}".format(redirect_uri))
+                    url = "https://api.webex.com/v1/oauth2/token"
 
-                payload = {'grant_type': 'authorization_code',
-                           'client_id': client_id,
-                           'client_secret': client_secret,
-                           'code': code,
-                           'redirect_uri': redirect_uri,
-                           'code_verifier': 'abc'
-                           }
-                headers = {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-
-                response = requests.request(
-                    "POST", url, headers=headers, data=payload)
-
-                logging.debug(
-                    "response code-- {}".format(response.status_code))
-
-                status_code = response.status_code
-
-                logging.debug('==============================')
-                resp = response.json()
-
-                if status_code != 200:
-                    return {'payload': response.text.encode('utf8'), 'status': 200}
-
-                logging.debug('==============================')
-                if resp['access_token'] and resp['refresh_token']:
-                    result = {
-                        "access_token": resp['access_token'].encode('utf8'),
-                        "refresh_token": resp['refresh_token'].encode('utf8')
+                    payload = {'grant_type': 'authorization_code',
+                               'client_id': client_id,
+                               'client_secret': client_secret,
+                               'code': code,
+                               'redirect_uri': redirect_uri,
+                               'code_verifier': 'abc'
+                               }
+                    headers = {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     }
 
-                logging.debug('type of result: {}'.format(type(result)))
-                logging.debug('type of access_token: {}'.format(
-                    type(result["access_token"])))
+                    response = requests.request(
+                        "POST", url, headers=headers, data=payload)
+
+                    logging.debug(
+                        "response code -- {}".format(response.status_code))
+
+                    status_code = response.status_code
+
+                    resp = response.json()
+
+                    if status_code != 200:
+                        return {'payload': response.text, 'status': 200}
+
+                    if resp['access_token'] and resp['refresh_token']:
+                        result = {
+                            "access_token": resp['access_token'],
+                            "refresh_token": resp['refresh_token']
+                        }
+                except Exception as e:
+                    logging.debug("Payload error: {}".format(e))
                 try:
                     os.system("rm -f {}".format(creds_file_name))
                 except Exception as e:

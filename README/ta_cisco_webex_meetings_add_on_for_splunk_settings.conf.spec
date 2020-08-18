@@ -13,6 +13,7 @@ loglevel =
 [additional_parameters]
 site_name = 
 username = 
+hostname = 
 client_id =
 client_secret =
 password = 

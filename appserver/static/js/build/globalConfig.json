@@ -68,6 +68,21 @@
                             "defaultValue": "password"
                         },
                         {
+                            "field": "hostname",
+                            "label": "Hostname",
+                            "type": "text",
+                            "help": "Hostname of Splunk Instance",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
                             "field": "client_id",
                             "label": "Client Id",
                             "type": "text",
