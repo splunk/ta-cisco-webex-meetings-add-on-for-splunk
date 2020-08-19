@@ -50,9 +50,10 @@ An integration is what you'd have to use if you have Single Sign-On (SSO) or OAu
 - Click on `Add App Information` button on the top right corner.
 - Enter the following details:
     - **Integration name**: Enter a integration name as you like. 
-    - **Redirect URI**: The Redirect URI **MUST** follow this pattern: **http://`{{hostname}}`:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth**. Please  replace the `{{hostname}}` with the hostname of the Splunk Heavy Forwarder (or IDM). For example, if the hostname of the HF or IDM is 0.0.0.0, the Redirect URI you have to enter is `http://0.0.0.0:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
-    - **Scope**: Please **ONLY** pick `read_all`. **DO NOT** pick any other options.
-    - **Description**: Enter some details about your integration does. This is optional. 
+    - **Redirect URI**: The Redirect URI **MUST** follow this pattern: 
+    ```http://{{hostname}}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth```
+    Please  replace the `{{hostname}}` with the hostname of the Splunk Heavy Forwarder (or IDM). For example, if the hostname of the HF or IDM is `0.0.0.0`, the Redirect URI you have to enter is:
+    `http://0.0.0.0:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
 - Click on `Submit` button.
 - Please copy the `Client ID` and `Client Secret` somewhere for further use.
 
@@ -86,7 +87,7 @@ If you use a Webex Service Account, please refer to [Section 3.1](https://github
       - **Refresh Token** (_optional_): **Please leave it blank**. (Refresh Token is optional for Basic Password Auth type.) 
     - Click on the `Save` green button.
     ###### 3.2 Set global settings for SSO/OAuth
-    Please refer to [Create a Webex Meetings OAuth Integration App](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk#create-a-webex-meetings-oauth-integration-app) section to create a integration app first.
+    Please refer to [Create a Webex Meetings OAuth Integration App](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk#create-a-webex-meetings-oauth-integration-app) section to create an integration app first.
     - Click on `Configuration` button on the top left corner.
     - Click on `Add-on Settings` button.
     - Enter the following details:
