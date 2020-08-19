@@ -45,16 +45,16 @@ Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.web
 
 #### Create a Webex Meetings OAuth Integration App
 
-An integration is what you'd have to use if you have Single Sign-On (SSO) or OAuth enabled in your Webex account and you are not able to create a Service Account. This requires you to be logged in to [Cisco DevNet](https://developer.cisco.com/site/webex-integration/) using a Webex Meetings Site Admin account. The dialog prompt for logging in to DevNet has the option to Login with Webex Meetings. Please make sure you pick the `Login with Webex Meetings` option, and other log in options will not work for this purpose. After login you can create a dedicated integeration app for this Add-on.
+An integration is what you'd have to use if you have Single Sign-On (SSO) or OAuth enabled in your Webex account and you are not able to create a Service Account. This requires you to be logged in to [Cisco DevNet](https://developer.cisco.com/site/webex-integration/) using a Webex Meetings Site Admin account. The dialog prompt for logging in to DevNet has the option to Login with Webex Meetings. Please make sure you pick the `Login with Webex Meetings` option, and other log in options will not work for this purpose. After login you can create a dedicated integration app for this Add-on.
 - Log in to [Cisco DevNet](https://developer.cisco.com/site/webex-integration/) using a Webex Meetings Site Admin account.
-- Click on `Add App Information` button on the top right corner.
+- Click on the `Add App Information` button on the top right corner.
 - Enter the following details:
-    - **Integration name**: Enter a integration name as you like. 
+    - **Integration name**: Enter an integration name as you like. 
     - **Redirect URI**: The Redirect URI **MUST** follow this pattern: 
     ```http://{{hostname}}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth```
     Please  replace the `{{hostname}}` with the hostname of the Splunk Heavy Forwarder (or IDM). For example, if the hostname of the HF or IDM is `0.0.0.0`, the Redirect URI you have to enter is:
     `http://0.0.0.0:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
-- Click on `Submit` button.
+- Click on the `Submit` button.
 - Please copy the `Client ID` and `Client Secret` somewhere for further use.
 
 #### Installation and Configuration Steps
