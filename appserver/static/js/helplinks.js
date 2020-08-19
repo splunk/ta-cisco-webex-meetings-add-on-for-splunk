@@ -31,7 +31,8 @@ function clickEvent() {
     });
     // fetch / ajax / xhr
     let redirect_uri = `http://${hostname}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
-    url = `https://api.webex.com/v1/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=all_read+meeting_modify+recording_modify+user_modify+setting_modify&state=abc&code_challenge=abc&code_challenge_method=plain`
+    // url = `https://api.webex.com/v1/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=all_read+meeting_modify+recording_modify+user_modify+setting_modify&state=abc&code_challenge=abc&code_challenge_method=plain`
+    url = `https://api.webex.com/v1/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=all_read&state=set_state_here&code_challenge=abc&code_challenge_method=plain`
     console.log("Clicked URL : " + url);
     window.open(url, 'popup', 'width=700,height=700');
     // window.open(url);
