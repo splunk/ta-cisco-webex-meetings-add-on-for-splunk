@@ -61,7 +61,6 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
 
         request = json.loads(in_string)
         logging.debug('type of request: {}'.format(type(request)))
-        # logging.debug('request: {}'.format(request))
 
         method = request['method']
         logging.debug('method: {}'.format(method))
@@ -72,23 +71,17 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 form_params = flatten_query_params(request['form'])
                 logging.debug(
                     'type of form_params: {}'.format(type(form_params)))
-                # logging.debug('form_params: {}'.format(form_params))
 
                 hostname = form_params.get("hostname", None)
                 client_id = form_params.get("client_id", None)
                 client_secret = form_params.get(
                     "client_secret", None)
-                # hostname = form_params.get("hostname", None).encode('utf8')
-                # client_id = form_params.get("client_id", None).encode('utf8')
-                # client_secret = form_params.get(
-                #     "client_secret", None).encode('utf8')
 
                 creds_data = {
                     "hostname": hostname,
                     "client_id": client_id,
                     "client_secret": client_secret
                 }
-                # logging.debug('creds_data: {}'.format(creds_data))
                 write_to_file(json.dumps(creds_data))
                 logging.debug("Wrote to file")
             except Exception as e:
@@ -145,10 +138,25 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                         return {'payload': response.text, 'status': 200}
 
                     if resp['access_token'] and resp['refresh_token']:
-                        result = {
-                            "access_token": resp['access_token'],
-                            "refresh_token": resp['refresh_token']
-                        }
+                        # result = {
+                        #     "access_token": resp['access_token'],
+                        #     "refresh_token": resp['refresh_token']
+                        # }
+                        result = '''
+                        <div style='width:510px;'>
+                            <h1>Permissions Granted!</h1>
+                        </div>
+                        <div style='word-break: break-all;'>
+                            <h3>Please Copy the Access Token and Refresh Token</h3>
+                            <br>
+                            <h4>Access Token</h4>
+                            <p>{access_token}</p>
+                            <br>
+                            <h4>Refresh Token</h4>
+                            <p>{refresh_token}</p>
+                        </div>
+                        ''' .format(access_token=resp['access_token'], refresh_token=resp['refresh_token'])
+
                 except Exception as e:
                     logging.debug("Payload error: {}".format(e))
                 try:

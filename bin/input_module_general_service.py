@@ -69,13 +69,11 @@ def collect_events(helper, ew):
             "client_secret")
         params['opt_refresh_token'] = helper.get_global_setting(
             "refresh_token")
+        params['hostname'] = helper.get_global_setting(
+            "hostname")
 
         # update_access_token(helper, params)
         update_access_token_with_validation(helper, params)
-
-    # MUST REMOVE LATER
-    helper.log_debug(
-        "access_token_used: ++++++++ {}".format(params['opt_password']))
 
     timestamp_key = "timestamp_{}_{}_processing".format(
         helper.get_input_stanza_names(), params['opt_endpoint'])
