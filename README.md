@@ -70,7 +70,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 1. Open the Web UI for the Heavy Forwarder (or IDM).
 2. Access the TA from the list of applications.
 3. Set global setings.
-If you use a Webex Service Account, please refer to Section 3.1 to set global settings. If you have Single Sign-On (SSO) or OAuth enabled in your Webex accout, please refer to Section 3.2 to set global settings. 
+If you use a Webex Service Account, please refer to [Section 3.1](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/tree/Oauth-SSO#31-set-global-settings-for-webex-service-account) to set global settings. If you have Single Sign-On (SSO) or OAuth enabled in your Webex accout, please refer to [Section 3.2](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk/tree/Oauth-SSO#32-set-global-settings-for-ssooauth) to set global settings. 
     ###### 3.1 Set global settings for Webex Service Account
     Please refer to [Create a Service Account](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk#create-a-service-account) section to create a Sevice Account first. 
     - Click on `Configuration` button on the top left corner.
