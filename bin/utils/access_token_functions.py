@@ -30,14 +30,15 @@ def get_access_token_by_refresh_token(client_id, client_secret, refresh_token, r
 
 def update_access_token(helper, params):
     # set the redirect_uri
-    redirect_uri = "http://localhost:10060/oauth"
+    redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+        params['hostname'])
+    helper.log_debug("redirect_uri : {}".format(redirect_uri))
 
     refresh_token_key = "refresh_token_processing"
 
     # get the refresh_token form checkpoint
     refresh_token = helper.get_check_point(refresh_token_key)
-    helper.log_debug(
-        "refresh_token_from_checkpoint ******* {}".format(refresh_token))
+
     # first time get the refresh_token and access_token from UI
     if refresh_token is None:
         # save checkpoint for refresh_token
@@ -49,15 +50,13 @@ def update_access_token(helper, params):
         params.update({"opt_password": new_access_token})
         # update checkpoint for refresh_token
         helper.save_check_point(refresh_token_key, new_refresh_token)
-        helper.log_debug(
-            "new_refresh_token -------- {}".format(new_refresh_token))
-    helper.log_debug(
-        "current_access_token -------- {}".format(params["opt_password"]))
 
 
 def update_access_token_with_validation(helper, params):
     # set the redirect_uri
-    redirect_uri = "http://localhost:10060/oauth"
+    redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+        params['hostname'])
+    helper.log_debug("redirect_uri : {}".format(redirect_uri))
 
     access_token_key = "access_token_processing"
     refresh_token_key = "refresh_token_processing"
@@ -65,10 +64,6 @@ def update_access_token_with_validation(helper, params):
     # get the access_token form checkpoint
     access_token = helper.get_check_point(access_token_key)
     refresh_token = helper.get_check_point(refresh_token_key)
-    helper.log_debug(
-        "access_token_from_checkpoint ******* {}".format(access_token))
-    helper.log_debug(
-        "refresh_token_from_checkpoint ******* {}".format(refresh_token))
 
     # First time
     if access_token is None:
@@ -84,6 +79,7 @@ def update_access_token_with_validation(helper, params):
         helper.log_debug("***now*** : {}".format(now))
         expired_time = (now + timedelta(seconds=7000)
                         ).strftime('%m/%d/%Y %H:%M:%S')
+
         helper.log_debug("***expired_time*** : {}".format(expired_time))
         helper.save_check_point(expiry_key, expired_time)
     else:
@@ -91,8 +87,6 @@ def update_access_token_with_validation(helper, params):
         expiry_key = "expiry_key_for_{}".format(access_token)
         expired_time = helper.get_check_point(expiry_key)
 
-        helper.log_debug("+++expiry_key+++ : {}".format(expiry_key))
-        helper.log_debug("+++expired_time+++ : {}".format(expired_time))
         if expired_time:
             expired_time = datetime.strptime(expired_time, '%m/%d/%Y %H:%M:%S')
             now = datetime.utcnow()
@@ -110,11 +104,6 @@ def update_access_token_with_validation(helper, params):
                 new_access_token, new_refresh_token, expires_in = get_access_token_by_refresh_token(
                     params['opt_client_id'], params['opt_client_secret'], refresh_token, redirect_uri)
 
-                helper.log_debug(
-                    "new_access_token ------- {}".format(new_access_token))
-                helper.log_debug(
-                    "new_refresh_token------- {}".format(new_refresh_token))
-
                 # update access_token checkpoint
                 helper.save_check_point(access_token_key, new_access_token)
 
@@ -123,18 +112,12 @@ def update_access_token_with_validation(helper, params):
 
                 # update access_token's expired_time checkpoint
                 delta = int(expires_in) - 100
-                helper.log_debug("delta ----- {}".format(delta))
-                helper.log_debug("old_expiry_key ------ {}".format(expiry_key))
 
                 helper.delete_check_point(expiry_key)
 
                 new_expiry_key = "expiry_key_for_{}".format(new_access_token)
-                helper.log_debug(
-                    "new_expiry_key ------- {}".format(new_expiry_key))
                 new_expired_time = (
                     now + timedelta(seconds=delta)).strftime('%m/%d/%Y %H:%M:%S')
                 helper.save_check_point(new_expiry_key, new_expired_time)
 
                 params.update({"opt_password": new_access_token})
-        helper.log_debug(
-            "current_access_token---{}".format(params['opt_password']))
