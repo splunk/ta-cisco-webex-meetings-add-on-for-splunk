@@ -109,7 +109,7 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
   - Tested for installation and basic ingestion on 8.1.0, 8.0.1, 7.3, 7.2, and 7.0 based on Cisco WebEx Meetings test account.
 
 
-> Built by Splunk's FDSE Team (#team-fdse).
+> Built by Splunk's FDSE Team.
 
 
 ## Credits & Acknowledgements
