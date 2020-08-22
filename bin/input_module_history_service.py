@@ -12,7 +12,7 @@ from datetime import datetime
 
 from utils.webex_constant import authentication_type
 from utils.webex_common_functions import fetch_webex_logs
-from utils.access_token_functions import get_access_token_by_refresh_token, update_access_token, update_access_token_with_validation
+from utils.access_token_functions import update_access_token_with_validation
 
 
 def validate_input(helper, definition):
@@ -78,20 +78,19 @@ def collect_events(helper, ew):
     helper.log_debug("Historical Data")
     for opt_endpoint in opt_endpoints:
 
-        # # Handle OAuth Situation
-        # # if password_type is NOT password, override password by access token
-        # helper.log_debug("password_type: {}".format(params['password_type']))
-        # if params['password_type'] != "password":
-        #     params['opt_client_id'] = helper.get_global_setting("client_id")
-        #     params['opt_client_secret'] = helper.get_global_setting(
-        #         "client_secret")
-        #     params['opt_refresh_token'] = helper.get_global_setting(
-        #         "refresh_token")
-        #     params['hostname'] = helper.get_global_setting(
-        #         "hostname")
+        # Handle OAuth Situation
+        # if password_type is NOT password, override password by access token
+        helper.log_debug("password_type: {}".format(params['password_type']))
+        if params['password_type'] != "password":
+            params['opt_client_id'] = helper.get_global_setting("client_id")
+            params['opt_client_secret'] = helper.get_global_setting(
+                "client_secret")
+            params['opt_refresh_token'] = helper.get_global_setting(
+                "refresh_token")
+            params['hostname'] = helper.get_global_setting(
+                "hostname")
 
-        #     # update_access_token(helper, params)
-        #     update_access_token_with_validation(helper, params)
+            update_access_token_with_validation(helper, params)
 
         helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
@@ -123,21 +122,6 @@ def collect_events(helper, ew):
         params.update({"start_time": start_time})
         params.update({"end_time": end_time})
         params.update({"timestamp_key": timestamp_key})
-
-        # Handle OAuth Situation
-        # if password_type is NOT password, override password by access token
-        helper.log_debug("password_type: {}".format(params['password_type']))
-        if params['password_type'] != "password":
-            params['opt_client_id'] = helper.get_global_setting("client_id")
-            params['opt_client_secret'] = helper.get_global_setting(
-                "client_secret")
-            params['opt_refresh_token'] = helper.get_global_setting(
-                "refresh_token")
-            params['hostname'] = helper.get_global_setting(
-                "hostname")
-
-            # update_access_token(helper, params)
-            update_access_token_with_validation(helper, params)
 
         records = params['limit']
         offset = 1
