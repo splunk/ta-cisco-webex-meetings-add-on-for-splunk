@@ -50,8 +50,6 @@ def get_cred_from_password_storage(helper, session_key, realm, cred_name):
     try:
         returned_credential = [k for k in storage_passwords if k.content.get(
             'realm') == realm and k.content.get('username') == cred_name]
-        # helper.log_debug(
-        #     "returned_credential : {}".format(returned_credential))
     except Exception as e:
         helper.log_info(
             "[-] Failed to get {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
@@ -62,18 +60,11 @@ def get_cred_from_password_storage(helper, session_key, realm, cred_name):
 
     else:
         returned_credential = returned_credential[0]
-        helper.log_debug(
-            "returned_credential[0] : {}".format(returned_credential))
         return returned_credential.content.get('clear_password')
 
 
 def update_cred_in_password_storage(helper, session_key, realm, cred_name, cred_password):
-    # splunk_dest_app = 'ta-cisco-webex-meetings-add-on-for-splunk'
-
     splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
-    # splunkService = client.connect(host=splunk_server, port=8089,
-    #                                username=splunk_admin, password=splunk_password, app=splunk_dest_app)
-    # helper.log_debug("splunkService: {}".format(splunkService))
 
     if get_cred_from_password_storage(helper, session_key, realm, cred_name):
         try:
@@ -88,12 +79,7 @@ def update_cred_in_password_storage(helper, session_key, realm, cred_name, cred_
         returned_credential = splunkService.storage_passwords.create(
             cred_password, cred_name, realm)
         helper.log_debug("=====Updated {}:{}=====".format(realm, cred_name))
-        helper.log_debug("after returned_credential.content.get('username'): {}".format(
-            returned_credential.content.get('username')))
-        helper.log_debug(
-            "after returned_credential.content.get('clear_password'): {}".format(returned_credential.content.get('clear_password')))
-        # helper.log_debug(
-        #     "after returned_credential.content: {}".format(returned_credential.content))
+        
     except Exception as e:
         helper.log_info(
             "[-] Failed to update {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
