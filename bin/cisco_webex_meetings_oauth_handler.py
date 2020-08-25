@@ -4,6 +4,10 @@ import sys
 import json
 import logging
 import requests
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "utils"))
+import splunklib.client as client
+
+SPLUNK_DEST_APP = 'ta-cisco-webex-meetings-add-on-for-splunk'
 
 if sys.platform == "win32":
     import msvcrt
@@ -45,6 +49,42 @@ def flatten_query_params(params):
     return flattened
 
 
+def delete_creds_from_password_storage(session_key, realm, cred_name):
+
+    splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
+    # check if cred is already here
+    storage_passwords = splunkService.storage_passwords
+    try:
+        returned_credential = [k for k in storage_passwords if k.content.get(
+            'realm') == realm and k.content.get('username') == cred_name]
+    except Exception as e:
+        logging.info(
+            "[-] Failed to get {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
+        raise e
+    
+    # if exist, delete it
+    if len(returned_credential) != 0:
+        try:
+            splunkService.storage_passwords.delete(cred_name, realm)
+            logging.debug(
+                "=====Deleted old {}:{}=====".format(realm, cred_name))
+        except Exception as e:
+            logging.info(
+                "[-] Failed to delete {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
+            raise e
+
+    # # save it
+    # try:
+    #     new_credential = splunkService.storage_passwords.create(
+    #         cred_password, cred_name, realm)
+    #     logging.debug("=====Updated {}:{}=====".format(realm, cred_name))
+    # except Exception as e:
+    #     logging.info(
+    #         "[-] Failed to update {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
+    #     raise e
+
+
+
 class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
     def __init__(self, _command_line, _command_arg):
         super(PersistentServerConnectionApplication, self).__init__()
@@ -76,11 +116,17 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 client_id = form_params.get("client_id", None)
                 client_secret = form_params.get(
                     "client_secret", None)
+                splunk_site = form_params.get(
+                    "splunk_site", None)
+                splunk_web_port = form_params.get(
+                    "splunk_web_port", None)
 
                 creds_data = {
                     "hostname": hostname,
                     "client_id": client_id,
-                    "client_secret": client_secret
+                    "client_secret": client_secret,
+                    "splunk_site": splunk_site,
+                    "splunk_web_port": splunk_web_port
                 }
                 write_to_file(json.dumps(creds_data))
                 logging.debug("Wrote to file")
@@ -92,7 +138,6 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
             # read the creds from file
             logging.debug("======Reading file...======")
             creds_dict = read_file()
-
             if creds_dict:
                 try:
                     creds_dict = json.loads(creds_dict)
@@ -100,6 +145,10 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     client_id = creds_dict.get("client_id", None)
                     client_secret = creds_dict.get(
                         "client_secret", None)
+                    splunk_site = creds_dict.get(
+                        "splunk_site", None)
+                    splunk_web_port = creds_dict.get(
+                        "splunk_web_port", None)
 
                     # get the code from request
                     query_params = flatten_query_params(request['query'])
@@ -107,9 +156,10 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     code = query_params['code']
                     # code = code.encode('utf8')
 
-                    redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-                        hostname)
+                    redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+                        hostname=hostname, splunk_web_port=splunk_web_port, splunk_site=splunk_site)
                     logging.debug("redirect_uri -- {}".format(redirect_uri))
+
                     url = "https://api.webex.com/v1/oauth2/token"
 
                     payload = {'grant_type': 'authorization_code',
@@ -163,6 +213,26 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     os.system("rm -f {}".format(creds_file_name))
                 except Exception as e:
                     logging.debug('os.system error: {}'.format(
+                        e))
+                
+                # TODO delete the creds inside the password storage if it is there.              
+                try: 
+                
+                    logging.debug("======Delete old Creds if exist======")    
+                    session_key = request['session']['authtoken']
+                    realm = 'ta-cisco-webex-meetings-add-on-for-splunk'
+                    
+                    access_token_key = "access_token_processing"
+                    refresh_token_key = "refresh_token_processing"
+
+                    # delete if exist 
+                    delete_creds_from_password_storage(session_key, realm, access_token_key)
+                    delete_creds_from_password_storage(session_key, realm, refresh_token_key)
+                    # update_cred_in_password_storage(session_key, realm, access_token_key, resp['access_token'])
+                    # update_cred_in_password_storage(session_key, realm, refresh_token_key, resp['refresh_token'])
+                    logging.debug("======Done======")
+                except Exception as e:
+                    logging.debug('Error happend when updated creds in storage/password endpoint. \n Error message: {}'.format(
                         e))
 
                 return {'payload': result, 'status': 200}
