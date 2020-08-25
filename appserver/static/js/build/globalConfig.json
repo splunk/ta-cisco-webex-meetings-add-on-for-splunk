@@ -83,6 +83,42 @@
                             }]
                         },
                         {
+                            "field": "splunk_site",
+                            "label": "Splunk Site",
+                            "type": "text",
+                            "help": "The Splunk Site. For example, if you are on Splunk US site, please enter en-US",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "en-US"
+                            }
+                        },
+                        {
+                            "field": "splunk_web_port",
+                            "label": "Splunk Web Server Port",
+                            "type": "text",
+                            "help": "Splunk Web server port, which is port 8000 by default. If you customize it to other number, please specify it here.",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "8000"
+                            }
+                        },
+                        {
                             "field": "client_id",
                             "label": "Client ID",
                             "type": "text",

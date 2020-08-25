@@ -19,3 +19,5 @@ client_secret =
 password = 
 password_type =
 refresh_token =
+splunk_site =
+splunk_web_port =

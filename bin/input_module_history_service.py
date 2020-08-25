@@ -89,6 +89,10 @@ def collect_events(helper, ew):
                 "refresh_token")
             params['hostname'] = helper.get_global_setting(
                 "hostname")
+            params['splunk_site'] = helper.get_global_setting(
+                "splunk_site")
+            params['splunk_web_port'] = helper.get_global_setting(
+                "splunk_web_port")
 
             update_access_token_with_validation(helper, params)
 

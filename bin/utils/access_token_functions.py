@@ -88,8 +88,11 @@ def update_cred_in_password_storage(helper, session_key, realm, cred_name, cred_
 
 def update_access_token_with_validation(helper, params):
     # set the redirect_uri
-    redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-        params['hostname'])
+    # redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+    #     params['hostname'])
+    
+    redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+        hostname=params['hostname'], splunk_web_port=params['splunk_web_port'], splunk_site=params['splunk_site'])
     helper.log_debug("redirect_uri : {}".format(redirect_uri))
 
     # get session key
@@ -110,8 +113,9 @@ def update_access_token_with_validation(helper, params):
         helper, session_key, realm, access_token_key)
     refresh_token = get_cred_from_password_storage(
         helper, session_key, realm, refresh_token_key)
+    
 
-    # First time -- There is no refresh token and access token in storage/passwords endpoint
+    # First time / Update from UI -- There is no refresh token and access token in storage/passwords endpoint
     if access_token is None:
         # Check if the refresh token from UI is valid to avoid user enter a wrong refresh token
         first_time_access_token, first_time_refresh_token, expires_in = get_access_token_by_refresh_token(
@@ -130,7 +134,7 @@ def update_access_token_with_validation(helper, params):
             # save checkpoint for access_token's expired_time
             now = datetime.utcnow()
             helper.log_debug("***now*** : {}".format(now))
-            delta = int(expires_in) - 100
+            delta = int(expires_in) - 7100
             expired_time = (now + timedelta(seconds=delta)
                             ).strftime('%m/%d/%Y %H:%M:%S')
 
@@ -172,7 +176,7 @@ def update_access_token_with_validation(helper, params):
                     helper, session_key, realm, refresh_token_key, new_refresh_token)
 
                 # update access_token's expired_time checkpoint
-                delta = int(expires_in) - 100
+                delta = int(expires_in) - 7100
                 new_expired_time = (
                     now + timedelta(seconds=delta)).strftime('%m/%d/%Y %H:%M:%S')
                 helper.save_check_point(expiry_key, new_expired_time)
