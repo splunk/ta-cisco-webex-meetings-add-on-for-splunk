@@ -84,12 +84,11 @@ def update_cred_in_password_storage(helper, splunkService, realm, cred_name, cre
 
 
 def update_access_token_with_validation(helper, params):
-    # set the redirect_uri
-    # redirect_uri = "http://{}:8000/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-    #     params['hostname'])
-    
-    redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-        hostname=params['hostname'], splunk_web_port=params['splunk_web_port'], splunk_site=params['splunk_site'])
+    # set the redirect_uri    
+    # redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+    #     hostname=params['hostname'], splunk_web_port=params['splunk_web_port'], splunk_site=params['splunk_site'])
+
+    redirect_uri = params['redirect_uri']
     helper.log_debug("redirect_uri : {}".format(redirect_uri))
 
     # get session key

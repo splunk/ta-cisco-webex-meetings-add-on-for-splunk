@@ -10,13 +10,9 @@ document.addEventListener("DOMNodeInserted", function (event) {
 }, false);
 
 function clickEvent() {
-    let hostname = getInputValue('additional_parameters-hostname')
     let client_id = getInputValue('additional_parameters-client_id')
     let client_secret = getInputValue('additional_parameters-client_secret')
-    let splunk_site = getInputValue('additional_parameters-splunk_site')
-    let splunk_web_port = getInputValue('additional_parameters-splunk_web_port')
-
-
+    let redirect_uri = getInputValue('additional_parameters-redirect_uri')
 
     var settings = {
         "url": "/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth",
@@ -26,14 +22,14 @@ function clickEvent() {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 
         },
-        "data": $.param({ "hostname": hostname, "client_id": client_id, "client_secret": client_secret, "splunk_site": splunk_site, "splunk_web_port": splunk_web_port}),
+        "data": $.param({ "redirect_uri": redirect_uri, "client_id": client_id, "client_secret": client_secret}),
         // JSON.stringify() -> applicaiton/json
     };
     $.ajax(settings).done(function (response) {
         console.log("response", response["method"]);
     });
     // fetch / ajax / xhr
-    let redirect_uri = `http://${hostname}:${splunk_web_port}/${splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth`
+    // let redirect_uri = `http://${hostname}:${splunk_web_port}/${splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth`
     console.log("redirect_uri", redirect_uri)
     url = `https://api.webex.com/v1/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=all_read&state=set_state_here&code_challenge=abc&code_challenge_method=plain`
     console.log("Clicked URL : " + url);

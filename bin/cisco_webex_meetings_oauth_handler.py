@@ -101,7 +101,6 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
 
         method = request['method']
         logging.debug('method: {}'.format(method))
-        logging.debug('type method: {}'.format(type(method)))
 
         # get session_key & creaet splunkService
         session_key = request['session']['authtoken']
@@ -115,22 +114,16 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 form_params = flatten_query_params(request['form'])
                 logging.debug(
                     'type of form_params: {}'.format(type(form_params)))
-
-                hostname = form_params.get("hostname", None)
+              
+                redirect_uri = form_params.get("redirect_uri", None)
                 client_id = form_params.get("client_id", None)
                 client_secret = form_params.get(
                     "client_secret", None)
-                splunk_site = form_params.get(
-                    "splunk_site", None)
-                splunk_web_port = form_params.get(
-                    "splunk_web_port", None)
 
                 creds_data = {
-                    "hostname": hostname,
+                    "redirect_uri": redirect_uri,
                     "client_id": client_id,
                     "client_secret": client_secret,
-                    "splunk_site": splunk_site,
-                    "splunk_web_port": splunk_web_port
                 }
                 # save to storage/password endpoint               
                 update_creds_from_password_storage(splunkService, realm, creds_key, json.dumps(creds_data))
@@ -143,17 +136,14 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
             # Get the creds from storage/password endpoint
             logging.debug("======Getting date from storage/password endpoint ...======")
             creds_dict = get_cred_from_password_storage(splunkService, realm, creds_key)
+            
             if creds_dict:
                 try:
                     creds_dict = json.loads(creds_dict)
-                    hostname = creds_dict.get("hostname", None)
+                    redirect_uri = creds_dict.get("redirect_uri", None)
                     client_id = creds_dict.get("client_id", None)
                     client_secret = creds_dict.get(
                         "client_secret", None)
-                    splunk_site = creds_dict.get(
-                        "splunk_site", None)
-                    splunk_web_port = creds_dict.get(
-                        "splunk_web_port", None)
 
                     # get the code from request
                     query_params = flatten_query_params(request['query'])
@@ -161,8 +151,8 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     code = query_params['code']
                     # code = code.encode('utf8')
 
-                    redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-                        hostname=hostname, splunk_web_port=splunk_web_port, splunk_site=splunk_site)
+                    # redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
+                    #     hostname=hostname, splunk_web_port=splunk_web_port, splunk_site=splunk_site)
                     logging.debug("redirect_uri -- {}".format(redirect_uri))
 
                     url = "https://api.webex.com/v1/oauth2/token"

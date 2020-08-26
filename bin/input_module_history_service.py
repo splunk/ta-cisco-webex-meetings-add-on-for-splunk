@@ -87,12 +87,8 @@ def collect_events(helper, ew):
                 "client_secret")
             params['opt_refresh_token'] = helper.get_global_setting(
                 "refresh_token")
-            params['hostname'] = helper.get_global_setting(
-                "hostname")
-            params['splunk_site'] = helper.get_global_setting(
-                "splunk_site")
-            params['splunk_web_port'] = helper.get_global_setting(
-                "splunk_web_port")
+            params['redirect_uri'] = helper.get_global_setting(
+            "redirect_uri")
 
             update_access_token_with_validation(helper, params)
 

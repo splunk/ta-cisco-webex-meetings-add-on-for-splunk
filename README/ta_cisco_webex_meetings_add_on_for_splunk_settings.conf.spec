@@ -13,11 +13,9 @@ loglevel =
 [additional_parameters]
 site_name = 
 username = 
-hostname = 
+redirect_uri = 
 client_id =
 client_secret =
 password = 
 password_type =
 refresh_token =
-splunk_site =
-splunk_web_port =
