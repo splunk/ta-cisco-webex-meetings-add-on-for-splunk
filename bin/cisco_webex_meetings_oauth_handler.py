@@ -23,19 +23,6 @@ creds_file_name = os.sep.join([os.environ['SPLUNK_HOME'], 'var',
                                'log', 'splunk', 'cisco_webex_meetings_oauth_creds.txt'])
 
 
-def write_to_file(message):
-    f = open(creds_file_name, "w")
-    f.write(message)
-    f.close()
-
-
-def read_file():
-    f = open(creds_file_name, "r")
-    message = f.read()
-    f.close()
-    return message
-
-
 def flatten_query_params(params):
     # Query parameters are provided as a list of pairs and can be repeated, e.g.:
     #
@@ -49,10 +36,9 @@ def flatten_query_params(params):
     return flattened
 
 
-def delete_creds_from_password_storage(session_key, realm, cred_name):
-
-    splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
-    # check if cred is already here
+def get_cred_from_password_storage(splunkService, realm, cred_name):
+    logging.debug(
+        "===================get password/storage for {}: {}================".format(realm, cred_name))
     storage_passwords = splunkService.storage_passwords
     try:
         returned_credential = [k for k in storage_passwords if k.content.get(
@@ -61,9 +47,16 @@ def delete_creds_from_password_storage(session_key, realm, cred_name):
         logging.info(
             "[-] Failed to get {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
         raise e
-    
-    # if exist, delete it
-    if len(returned_credential) != 0:
+
+    if len(returned_credential) == 0:
+        return None
+
+    else:
+        returned_credential = returned_credential[0]
+        return returned_credential.content.get('clear_password')
+
+def delete_creds_from_password_storage(splunkService, realm, cred_name):
+    if get_cred_from_password_storage(splunkService, realm, cred_name):
         try:
             splunkService.storage_passwords.delete(cred_name, realm)
             logging.debug(
@@ -73,15 +66,19 @@ def delete_creds_from_password_storage(session_key, realm, cred_name):
                 "[-] Failed to delete {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
             raise e
 
-    # # save it
-    # try:
-    #     new_credential = splunkService.storage_passwords.create(
-    #         cred_password, cred_name, realm)
-    #     logging.debug("=====Updated {}:{}=====".format(realm, cred_name))
-    # except Exception as e:
-    #     logging.info(
-    #         "[-] Failed to update {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
-    #     raise e
+
+
+def update_creds_from_password_storage(splunkService, realm, cred_name, cred_password):
+    delete_creds_from_password_storage(splunkService, realm, cred_name)
+    # save it
+    try:
+        new_credential = splunkService.storage_passwords.create(
+            cred_password, cred_name, realm)
+        logging.debug("=====Updated {}:{}=====".format(realm, cred_name))
+    except Exception as e:
+        logging.info(
+            "[-] Failed to update {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
+        raise e
 
 
 
@@ -106,6 +103,13 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
         logging.debug('method: {}'.format(method))
         logging.debug('type method: {}'.format(type(method)))
 
+        # get session_key & creaet splunkService
+        session_key = request['session']['authtoken']
+        splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
+
+        realm = 'ta-cisco-webex-meetings-add-on-for-splunk'
+        creds_key = "creds_key"
+
         if method == "POST":
             try:
                 form_params = flatten_query_params(request['form'])
@@ -128,16 +132,17 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     "splunk_site": splunk_site,
                     "splunk_web_port": splunk_web_port
                 }
-                write_to_file(json.dumps(creds_data))
-                logging.debug("Wrote to file")
+                # save to storage/password endpoint               
+                update_creds_from_password_storage(splunkService, realm, creds_key, json.dumps(creds_data))
+                logging.debug("Save to storage/password endpoint")
             except Exception as e:
                 logging.debug("err: {}".format(e))
                 pass
             return {'payload': request, 'status': 200}
         elif method == "GET":
-            # read the creds from file
-            logging.debug("======Reading file...======")
-            creds_dict = read_file()
+            # Get the creds from storage/password endpoint
+            logging.debug("======Getting date from storage/password endpoint ...======")
+            creds_dict = get_cred_from_password_storage(splunkService, realm, creds_key)
             if creds_dict:
                 try:
                     creds_dict = json.loads(creds_dict)
@@ -188,10 +193,6 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                         return {'payload': response.text, 'status': 200}
 
                     if resp['access_token'] and resp['refresh_token']:
-                        # result = {
-                        #     "access_token": resp['access_token'],
-                        #     "refresh_token": resp['refresh_token']
-                        # }
                         result = '''
                         <div style='width:510px;'>
                             <h1>Permissions Granted!</h1>
@@ -219,17 +220,13 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 try: 
                 
                     logging.debug("======Delete old Creds if exist======")    
-                    session_key = request['session']['authtoken']
-                    realm = 'ta-cisco-webex-meetings-add-on-for-splunk'
                     
                     access_token_key = "access_token_processing"
                     refresh_token_key = "refresh_token_processing"
 
                     # delete if exist 
-                    delete_creds_from_password_storage(session_key, realm, access_token_key)
-                    delete_creds_from_password_storage(session_key, realm, refresh_token_key)
-                    # update_cred_in_password_storage(session_key, realm, access_token_key, resp['access_token'])
-                    # update_cred_in_password_storage(session_key, realm, refresh_token_key, resp['refresh_token'])
+                    delete_creds_from_password_storage(splunkService, realm, access_token_key)
+                    delete_creds_from_password_storage(splunkService, realm, refresh_token_key)
                     logging.debug("======Done======")
                 except Exception as e:
                     logging.debug('Error happend when updated creds in storage/password endpoint. \n Error message: {}'.format(
