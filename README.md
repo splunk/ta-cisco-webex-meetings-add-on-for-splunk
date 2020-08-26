@@ -51,9 +51,13 @@ An integration is what you'd have to use if you have Single Sign-On (SSO) or OAu
 - Enter the following details:
     - **Integration name**: Enter a integration name as you like. 
     - **Redirect URI**: The Redirect URI **MUST** follow this pattern:
+
     ```https://{{domain}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth```
+
     Please replace the `{{domain}}` with the domain of your Splunk Heavy Forwarder (or IDM). For example, if the domain of your HF or IDM is `example.splunk.link`, the Redirect URI you have to enter is:
+
     `https://example.splunk.link/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
+
     **Note**: If your Splunk site is not in `en-US`, please change it to your true value. 
     - **Scope**: Please **ONLY** pick `read_all`. **DO NOT** pick any other options.
     - **Description**: Enter some details about your integration does. This is optional. 
