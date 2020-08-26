@@ -42,10 +42,9 @@ def get_access_token_by_refresh_token(helper, client_id, client_secret, refresh_
         raise e
 
 
-def get_cred_from_password_storage(helper, session_key, realm, cred_name):
+def get_cred_from_password_storage(helper, splunkService, realm, cred_name):
     helper.log_debug(
         "===================get password/storage for {}: {}================".format(realm, cred_name))
-    splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
     storage_passwords = splunkService.storage_passwords
     try:
         returned_credential = [k for k in storage_passwords if k.content.get(
@@ -63,10 +62,8 @@ def get_cred_from_password_storage(helper, session_key, realm, cred_name):
         return returned_credential.content.get('clear_password')
 
 
-def update_cred_in_password_storage(helper, session_key, realm, cred_name, cred_password):
-    splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
-
-    if get_cred_from_password_storage(helper, session_key, realm, cred_name):
+def update_cred_in_password_storage(helper, splunkService, realm, cred_name, cred_password):
+    if get_cred_from_password_storage(helper, splunkService, realm, cred_name):
         try:
             splunkService.storage_passwords.delete(cred_name, realm)
             helper.log_debug(
@@ -97,6 +94,9 @@ def update_access_token_with_validation(helper, params):
 
     # get session key
     session_key = helper.context_meta['session_key']
+    # create splunkService 
+    splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
+    helper.log_debug("----splunkService---- :{}".format(splunkService))
 
     # set creds name save to password storage
     access_token_key = "access_token_processing"
@@ -110,31 +110,29 @@ def update_access_token_with_validation(helper, params):
 
     # get the access_token and refresh_token from password storage
     access_token = get_cred_from_password_storage(
-        helper, session_key, realm, access_token_key)
+        helper, splunkService, realm, access_token_key)
     refresh_token = get_cred_from_password_storage(
-        helper, session_key, realm, refresh_token_key)
+        helper, splunkService, realm, refresh_token_key)
     
-
     # First time / Update from UI -- There is no refresh token and access token in storage/passwords endpoint
     if access_token is None:
         # Check if the refresh token from UI is valid to avoid user enter a wrong refresh token
         first_time_access_token, first_time_refresh_token, expires_in = get_access_token_by_refresh_token(
             helper, params['opt_client_id'], params['opt_client_secret'], params['opt_refresh_token'], redirect_uri)
 
-
         # save the valid refresh token and access token
         if first_time_access_token:
             # save access_token in password storage
             update_cred_in_password_storage(
-                helper, session_key, realm, access_token_key, first_time_access_token)
+                helper, splunkService, realm, access_token_key, first_time_access_token)
             # save refresh_token in password storage
             update_cred_in_password_storage(
-                helper, session_key, realm, refresh_token_key, first_time_refresh_token)
+                helper, splunkService, realm, refresh_token_key, first_time_refresh_token)
 
             # save checkpoint for access_token's expired_time
             now = datetime.utcnow()
             helper.log_debug("***now*** : {}".format(now))
-            delta = int(expires_in) - 7100
+            delta = int(expires_in) - 100
             expired_time = (now + timedelta(seconds=delta)
                             ).strftime('%m/%d/%Y %H:%M:%S')
 
@@ -169,14 +167,14 @@ def update_access_token_with_validation(helper, params):
 
                 # update access_token in password storage
                 update_cred_in_password_storage(
-                    helper, session_key, realm, access_token_key, new_access_token)
+                    helper, splunkService, realm, access_token_key, new_access_token)
 
                 # update refresh_token in password storage
                 update_cred_in_password_storage(
-                    helper, session_key, realm, refresh_token_key, new_refresh_token)
+                    helper, splunkService, realm, refresh_token_key, new_refresh_token)
 
                 # update access_token's expired_time checkpoint
-                delta = int(expires_in) - 7100
+                delta = int(expires_in) - 100
                 new_expired_time = (
                     now + timedelta(seconds=delta)).strftime('%m/%d/%Y %H:%M:%S')
                 helper.save_check_point(expiry_key, new_expired_time)
