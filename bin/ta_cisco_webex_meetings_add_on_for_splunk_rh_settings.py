@@ -117,9 +117,8 @@ fields_additional_parameters = [
         required=False,
         encrypted=False,
         default='',
-        validator=validator.String(
-            min_len=0,
-            max_len=8192,
+        validator=validator.Pattern(
+            regex="(^https:\/\/[^\s]+)",
         )
     ),
     field.RestField(
