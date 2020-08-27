@@ -61,7 +61,7 @@
                                     },
                                     {
                                         "value": "webExAccessToken",
-                                        "label": "OAuth/SSO"
+                                        "label": "OAuth"
                                     }
                                 ]
                             },
@@ -71,7 +71,7 @@
                             "field": "redirect_uri",
                             "label": "Redirect URI",
                             "type": "text",
-                            "help": "Must match the redirect URI defined in your Webex Meetings Integration configuration",
+                            "help": "Must match the Redirect URI defined in your Webex Meetings Integration configuration. For example, https://{{hostname}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth",
                             "required": false,
                             "defaultValue": "",
                             "encrypted": false,
@@ -82,7 +82,7 @@
                                 "errorMsg": "Max length of password is 8192"
                             }],
                             "options": {
-                                "placeholder": "http://{{hostname}}:{{port}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth"
+                                "placeholder": "https://{{hostname}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth"
                             }
                         },         
                         {
