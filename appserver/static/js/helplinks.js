@@ -50,3 +50,14 @@ function getInputValue(inputId) {
 
 
 
+function setRESTHandler(){
+    let full_url_arr = window.location.href.split("/");
+    $("#additional_parameters-redirect_uri").val(full_url_arr[0] + "/" + full_url_arr[1] + "/" + full_url_arr[2]  + "/" + full_url_arr[3]  + "/" + "splunkd/__raw/services/cisco-webex-meetings-oauth");
+}
+
+document.addEventListener("DOMContentLoaded", function(event) { 
+    //do work
+    setTimeout(function(){ 
+        setRESTHandler();
+    }, 5000);    
+});
