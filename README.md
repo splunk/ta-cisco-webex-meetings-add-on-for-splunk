@@ -60,7 +60,7 @@ An integration is what you'd have to use if you have Single Sign-On (SSO) or OAu
 
     **Note**: If your Splunk site is not in `en-US`, please change it to your true value. 
     - **Scope**: Please **ONLY** pick `read_all`. **DO NOT** pick any other options.
-    - **Description**: Enter some details about your integration does. This is optional. 
+    - **Description**: Enter some details about what your integration does. This is optional. 
 - Click on `Submit` button.
 - Please copy the `Client ID` and `Client Secret` somewhere for further use.
 
