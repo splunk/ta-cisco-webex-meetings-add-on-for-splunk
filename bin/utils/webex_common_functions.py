@@ -53,7 +53,7 @@ def fetch_webex_logs(ew, helper, params):
         ev = parse_xml_to_dict(response.text)
         ev = ev['message']
         response_key = tag_map[params['opt_endpoint']]
-        helper.log_debug(ev)
+        # helper.log_debug(ev)
 
         if "header" in ev:
             if "SUCCESS" in ev["header"]["response"]["result"]:
@@ -108,7 +108,6 @@ def fetch_webex_logs(ew, helper, params):
 def dump_in_index(event, ew, helper, opt_endpoint, timestamp_key, params):
     if isinstance(event, dict):
         # get the end time of this event
-        helper.log_info("Event Returned: {}".format(event))
         this_event_time = event[timestamp_map[opt_endpoint]]
 
         # get start time of this event and convert it to epoch time
