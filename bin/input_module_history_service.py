@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from datetime import datetime
 
 from utils.webex_constant import authentication_type
-from utils.webex_common_functions import fetch_webex_logs
+from utils.webex_common_functions import fetch_webex_logs, get_slice_time
 from utils.access_token_functions import update_access_token_with_validation
 
 
@@ -99,7 +99,7 @@ def collect_events(helper, ew):
         end_time = datetime.combine(
             enddt, datetime.max.time()).strftime('%m/%d/%Y %H:%M:%S')
 
-        # create checkpoint key for offest and timestamp
+        # create checkpoint key for timestamp
         timestamp_key = "timestamp_{}_{}_processing".format(
             helper.get_input_stanza_names(), opt_endpoint)
 
@@ -116,20 +116,33 @@ def collect_events(helper, ew):
         helper.log_debug("Start time: {}".format(start_time))
         helper.log_debug("End time: {}".format(end_time))
 
-        #  Update Parameters
-        params.update({"mode": "historical"})
-        params.update({"opt_endpoint": opt_endpoint})
-        params.update({"start_time": start_time})
-        params.update({"end_time": end_time})
-        params.update({"timestamp_key": timestamp_key})
 
-        records = params['limit']
-        offset = 1
-        while (records == params['limit']):
-            helper.log_debug("current_offset: {}".format(offset))
-            params['offset'] = offset
-            records = fetch_webex_logs(ew, helper, params)
-            helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
-                offset, params['limit'], records))
-            if records:
-                offset += records
+        # Paging 
+        # slice time range to day by day
+        steps = 60*60*24
+        time_list = get_slice_time(start_time, end_time, steps, helper)
+        # helper.log_debug("[-] time_list -- {}".format(time_list))
+        for time in time_list:
+            cur_start_time = time[0]           
+            cur_end_time = time[1]
+            helper.log_debug("[-] cur_start_time : {}".format(cur_start_time))
+            helper.log_debug("[-] cur_end_tine: {}".format(cur_end_time))
+            #  Update Parameters
+            params.update({"mode": "historical"})
+            params.update({"opt_endpoint": opt_endpoint})
+            params.update({"start_time": cur_start_time})
+            params.update({"end_time": cur_end_time})
+            params.update({"timestamp_key": timestamp_key})
+
+            records = params['limit']
+            offset = 1
+            while (records == params['limit']):
+                helper.log_debug("current_offset: {}".format(offset))
+                params['offset'] = offset
+                records = fetch_webex_logs(ew, helper, params)
+                helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
+                    offset, params['limit'], records))
+                if records:
+                    offset += records
+            
+

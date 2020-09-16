@@ -185,3 +185,35 @@ def parse_xml_to_dict(xml_string):
     return etree_to_dict(root)
 
 
+def get_slice_time(start_time, end_time, steps, helper):
+    """
+    @param start: string, UTC start time
+    @param end: string, UTC end time
+    @param steps: int
+    @return time_list: list of time string tuple
+    """
+    time_list = []
+    # convert UTC time string to UTC epoch
+    start = int((datetime.strptime(start_time, '%m/%d/%Y %H:%M:%S') - datetime(1970, 1, 1)).total_seconds())
+    end = int((datetime.strptime(end_time, '%m/%d/%Y %H:%M:%S') - datetime(1970, 1, 1)).total_seconds())
+    chunks = range(start, end, steps)
+    counter = 0
+    for chunk in chunks:
+        counter += 1
+        if len(chunks) is counter:
+            # convert UTC epoch to UTC time string
+            cur_start_time = datetime.utcfromtimestamp(
+            int(chunk)).strftime('%m/%d/%Y %H:%M:%S')
+            cur_end_time = datetime.utcfromtimestamp(
+            int(end)).strftime('%m/%d/%Y %H:%M:%S')
+            time_list.append((cur_start_time, cur_end_time))
+        else:
+            # convert UTC epoch to UTC time string
+            cur_start_time = datetime.utcfromtimestamp(
+            int(chunk)).strftime('%m/%d/%Y %H:%M:%S')
+            cur_end_time = datetime.utcfromtimestamp(
+            int(chunk+steps-1)).strftime('%m/%d/%Y %H:%M:%S')
+            time_list.append((cur_start_time, cur_end_time))
+    return time_list
+
+
