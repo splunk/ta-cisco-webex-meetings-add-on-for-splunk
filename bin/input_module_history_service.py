@@ -126,7 +126,7 @@ def collect_events(helper, ew):
             cur_start_time = time[0]           
             cur_end_time = time[1]
             helper.log_debug("[-] cur_start_time : {}".format(cur_start_time))
-            helper.log_debug("[-] cur_end_tine: {}".format(cur_end_time))
+            helper.log_debug("[-] cur_end_time: {}".format(cur_end_time))
             #  Update Parameters
             params.update({"mode": "historical"})
             params.update({"opt_endpoint": opt_endpoint})
