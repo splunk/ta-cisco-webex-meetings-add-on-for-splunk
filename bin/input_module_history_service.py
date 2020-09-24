@@ -20,6 +20,7 @@ def validate_input(helper, definition):
 
     start_time_start = definition.parameters.get('start_time_start', None)
     interval = definition.parameters.get('interval', None)
+    paging_interval = definition.parameters.get('paging_interval', None)
 
     if int(interval) < 86400:
         raise ValueError(
@@ -42,6 +43,13 @@ def validate_input(helper, definition):
             "Begin Date must be at least 3 days ago. Please enter a time before {}.".format(end_time.strftime('%m/%d/%Y %H:%M:%S')))
     pass
 
+    # validate paging interval
+    if paging_interval:
+        try:
+            int(paging_interval)
+        except ValueError:
+            raise ValueError("Invalid Paging Interval format. Please enter an Integer.")
+
 
 def collect_events(helper, ew):
     """Implement your data collection logic here"""
@@ -50,6 +58,8 @@ def collect_events(helper, ew):
     opt_endpoints = helper.get_arg('endpoints')
     opt_interval = int(helper.get_arg('interval'))
     opt_live = False
+    opt_paging_interval = helper.get_arg('paging_interval')
+    opt_paging_interval_unit = helper.get_arg('paging_interval_unit')
 
     proxy = helper.get_proxy()
     if proxy:
@@ -119,14 +129,39 @@ def collect_events(helper, ew):
 
         # Paging 
         # slice time range to day by day
-        steps = 60*60*24
+        helper.log_debug("opt_paging_interval: {}".format(opt_paging_interval))
+        helper.log_debug("opt_paging_interval_unit: {}".format(opt_paging_interval_unit))
+
+        # get the paging interval from UI, o.w. set it to 1 day
+        if opt_paging_interval and opt_paging_interval_unit:
+            opt_paging_interval = int(opt_paging_interval)
+            if "Sec" in opt_paging_interval_unit:
+                steps = opt_paging_interval
+            elif "Min" in opt_paging_interval_unit:
+                steps = opt_paging_interval * 60
+            elif "Hour" in opt_paging_interval_unit:
+                steps = opt_paging_interval * 60 * 60
+            elif "Day" in opt_paging_interval_unit:
+                steps = opt_paging_interval * 60 * 60 * 24
+            elif "Week" in opt_paging_interval_unit:
+                steps = opt_paging_interval * 60 * 60 * 24 * 7
+            elif "Year" in opt_paging_interval_unit:
+                steps = opt_paging_interval * 60 * 60 * 24 * 365
+            else:
+                steps = opt_paging_interval
+        else:
+            steps = 60*60*24
+        
+        helper.log_debug("Paging steps: {}".format(steps))
+
         time_list = get_slice_time(start_time, end_time, steps, helper)
         # helper.log_debug("[-] time_list -- {}".format(time_list))
+        request_cnt = 0
         for time in time_list:
             cur_start_time = time[0]           
             cur_end_time = time[1]
-            helper.log_debug("[-] cur_start_time : {}".format(cur_start_time))
-            helper.log_debug("[-] cur_end_time: {}".format(cur_end_time))
+            helper.log_debug("[-] cur_start_time for {}: {}".format(opt_endpoint, cur_start_time))
+            helper.log_debug("[-] cur_end_time for {}: {}".format(opt_endpoint, cur_end_time))
             #  Update Parameters
             params.update({"mode": "historical"})
             params.update({"opt_endpoint": opt_endpoint})
@@ -137,9 +172,12 @@ def collect_events(helper, ew):
             records = params['limit']
             offset = 1
             while (records == params['limit']):
+                request_cnt += 1
                 helper.log_debug("current_offset: {}".format(offset))
                 params['offset'] = offset
+                helper.log_debug("[-] {} Ingestion Interval: {}-{}, WebEx Request start time for {} (Local time zone): {}".format(request_cnt, cur_start_time, cur_end_time, params['opt_endpoint'], datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
                 records = fetch_webex_logs(ew, helper, params)
+                helper.log_debug("[-] {} Ingestion Interval: {}-{}, WebEx Request end time for {} (Local time zone): {}".format(request_cnt, cur_start_time, cur_end_time, params['opt_endpoint'], datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
                 helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
                     offset, params['limit'], records))
                 if records:

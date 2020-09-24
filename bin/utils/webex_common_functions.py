@@ -17,6 +17,7 @@ from io import StringIO
 
 from utils.webex_constant import tag_map, sourcetype_map, timestamp_map, start_time_map
 from utils.xml_payload_format import xml_format
+from utils.access_token_functions import update_access_token_with_validation
 
 
 def fetch_webex_logs(ew, helper, params):
@@ -53,7 +54,6 @@ def fetch_webex_logs(ew, helper, params):
         ev = parse_xml_to_dict(response.text)
         ev = ev['message']
         response_key = tag_map[params['opt_endpoint']]
-        # helper.log_debug(ev)
 
         if "header" in ev:
             if "SUCCESS" in ev["header"]["response"]["result"]:
@@ -93,6 +93,15 @@ def fetch_webex_logs(ew, helper, params):
                 helper.log_debug(
                     "[-] WebEx Response: {}".format(repr(ev["header"]["response"]["reason"])))
                 return 0
+            # Check if the access token is invalid
+            elif "WebEx access token is invalid" in ev["header"]["response"]["reason"]:
+                helper.log_debug(
+                    "[-] WebEx Response: {}".format(repr(ev["header"]["response"]["reason"])))
+                if params['password_type'] != "password":
+                    helper.log_info("[-] WebEx access token is either expired or invalid, trying to update it using refresh token")
+                    update_access_token_with_validation(helper, params)
+                    time.sleep(10)
+                    fetch_webex_logs(ew, helper, params)
             else:
                 helper.log_debug(
                     "[-] WebEx Response: {}".format(repr(ev["header"]["response"]["reason"])))
@@ -102,6 +111,8 @@ def fetch_webex_logs(ew, helper, params):
     except Exception as e:
         helper.log_info(
             "[-] WebEx Request Failed (Check URL and Given Error): {}".format(repr(e)))
+        helper.log_debug("[-] WebEx Request failed with error for {}, Ingestion Interval: {}-{}, failed time (Local time zone): {}".format(params['opt_endpoint'], params['start_time'], params['end_time'], datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
+
         raise e
 
 

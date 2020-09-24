@@ -76,7 +76,7 @@ def update_cred_in_password_storage(helper, splunkService, realm, cred_name, cre
         returned_credential = splunkService.storage_passwords.create(
             cred_password, cred_name, realm)
         helper.log_debug("=====Updated {}:{}=====".format(realm, cred_name))
-        
+
     except Exception as e:
         helper.log_info(
             "[-] Failed to update {}:{} from password storage. Error Message:  {}".format(realm, cred_name, repr(e)))
@@ -84,7 +84,7 @@ def update_cred_in_password_storage(helper, splunkService, realm, cred_name, cre
 
 
 def update_access_token_with_validation(helper, params):
-    # set the redirect_uri    
+    # set the redirect_uri
     # redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
     #     hostname=params['hostname'], splunk_web_port=params['splunk_web_port'], splunk_site=params['splunk_site'])
 
@@ -93,7 +93,7 @@ def update_access_token_with_validation(helper, params):
 
     # get session key
     session_key = helper.context_meta['session_key']
-    # create splunkService 
+    # create splunkService
     splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
     helper.log_debug("----splunkService---- :{}".format(splunkService))
 
@@ -112,7 +112,7 @@ def update_access_token_with_validation(helper, params):
         helper, splunkService, realm, access_token_key)
     refresh_token = get_cred_from_password_storage(
         helper, splunkService, realm, refresh_token_key)
-    
+
     # First time / Update from UI -- There is no refresh token and access token in storage/passwords endpoint
     if access_token is None:
         # Check if the refresh token from UI is valid to avoid user enter a wrong refresh token
@@ -142,7 +142,7 @@ def update_access_token_with_validation(helper, params):
             params.update({"opt_password": first_time_access_token})
         else:
             helper.log_info(
-                "[-] Error happend to Refresh Token Validation, Please check if you enter a correct Refresh Token/Client Id/Client Secret")          
+                "[-] Error happend to Refresh Token Validation, Please check if you enter a correct Refresh Token/Client Id/Client Secret")
     else:
         # check if the access token is expired
         expired_time = helper.get_check_point(expiry_key)
@@ -180,4 +180,4 @@ def update_access_token_with_validation(helper, params):
 
                 # use the new access_token
                 params.update({"opt_password": new_access_token})
-    
+

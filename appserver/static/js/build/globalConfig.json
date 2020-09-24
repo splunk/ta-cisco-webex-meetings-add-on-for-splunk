@@ -2,7 +2,7 @@
     "meta": {
         "name": "ta-cisco-webex-meetings-add-on-for-splunk",
         "displayName": "Cisco WebEx Meetings Add-on for Splunk",
-        "version": "1.1.7",
+        "version": "1.1.8",
         "apiVersion": "3.0.0",
         "restRoot": "ta_cisco_webex_meetings_add_on_for_splunk"
     },
@@ -318,6 +318,14 @@
                     {
                         "field": "start_time_start",
                         "label": "Begin Time"
+                    },
+                    {
+                        "field": "paging_interval",
+                        "label": "Paging Interval"
+                    },
+                    {
+                        "field": "paging_interval_unit",
+                        "label": "Paging Interval Unit"
                     }
                 ],
                 "actions": [
@@ -493,7 +501,7 @@
                         {
                             "field": "start_time_start",
                             "label": "Begin Time",
-                            "help": "This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                            "help": "This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
                             "required": true,
                             "type": "text",
                             "validators": [{
@@ -504,6 +512,60 @@
                             }],
                             "options": {
                                 "placeholder": "04/01/2020 00:00:00"
+                            }
+                        },
+                        {
+                            "field": "paging_interval",
+                            "label": "Paging Interval",
+                            "help": "Please enter an integer. This is used to slice the large time range. For example, if it is set to 1 day, the data will be ingested day by day. Format: Int.",
+                            "required": false,
+                            "type": "text",
+                            "defaultValue": "1",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "1"
+                            }
+                        },
+                        {
+                            "field": "paging_interval_unit",
+                            "label": "Paging Interval Unit",
+                            "help": "Choose the unit of the paging interval.",
+                            "required": false,
+                            "type": "singleSelect",
+                            "defaultValue": "Day",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [
+                                    {
+                                        "value": "Second",
+                                        "label": "Second"
+                                    },
+                                    {
+                                        "value": "Minute",
+                                        "label": "Minute"
+                                    },
+                                    {
+                                        "value": "Hour",
+                                        "label": "Hour"
+                                    },
+                                    {
+                                        "value": "Day",
+                                        "label": "Day"
+                                    },
+                                    {
+                                        "value": "Week",
+                                        "label": "Week"
+                                    },
+                                    {
+                                        "value": "Year",
+                                        "label": "Year"
+                                    }
+                                ]
                             }
                         }
                     ]
