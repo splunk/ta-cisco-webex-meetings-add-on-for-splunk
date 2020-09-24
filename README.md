@@ -127,6 +127,8 @@ If you use a Webex Service Account, please refer to Section 3.1 to set global se
     - **Index** (_required_): Index for storing data.
     - **Endpoints** (_required_): Historical endpoints that are used to fetch historical data back.
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
+    - **Paging Interval**: Please enter an integer. This is used to slice the large time range. For example, if your `Begin Time` is set to be 2 months ago, and the two-month data volume is too large to be handled in the first ingestion. You can leverage the `Paging Interval` to slice the time range. If it is set to 1 day, it will ingest data day by day instead of ingesting the 2-month data at one time. The default value is 1 day. Format: Int.
+    - **Paging Interval Unit**: Choose the unit of the paging interval.
 - Click on the `Add` green button on the bottom right of the pop-up box.
 6. Set Proxy Setting (optional)
  - Click on `Configuration` button on the top left corner.
