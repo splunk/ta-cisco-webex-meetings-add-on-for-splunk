@@ -72,9 +72,6 @@ def collect_events(helper, ew):
     else:
         proxies = None
 
-    helper.log_debug(
-        "[-] webex password_type: {}".format(helper.get_global_setting("password_type")))
-
     params = {"opt_username": helper.get_global_setting("username"),
               "opt_password": helper.get_global_setting("password"),
               "opt_site_name": helper.get_global_setting("site_name"),
@@ -85,12 +82,11 @@ def collect_events(helper, ew):
               "proxies": proxies}
 
     # Historical Data
-    helper.log_debug("Historical Data")
     for opt_endpoint in opt_endpoints:
 
         # Handle OAuth Situation
         # if password_type is NOT password, override password by access token
-        helper.log_debug("password_type: {}".format(params['password_type']))
+        helper.log_debug("[-] Endpoint: {}, password_type: {}".format(opt_endpoint, params['password_type']))
         if params['password_type'] != "password":
             params['opt_client_id'] = helper.get_global_setting("client_id")
             params['opt_client_secret'] = helper.get_global_setting(
@@ -101,8 +97,6 @@ def collect_events(helper, ew):
             "redirect_uri")
 
             update_access_token_with_validation(helper, params)
-
-        helper.log_debug("[-] \t At {}".format(opt_endpoint))
 
         # endtime is midnight of GMT - 3days
         enddt = datetime.utcnow().date() - timedelta(3)
@@ -123,14 +117,14 @@ def collect_events(helper, ew):
             start_time = (datetime.strptime(start_time, '%m/%d/%Y %H:%M:%S') +
                           timedelta(seconds=1)).strftime('%m/%d/%Y %H:%M:%S')
 
-        helper.log_debug("Start time: {}".format(start_time))
-        helper.log_debug("End time: {}".format(end_time))
+        helper.log_debug("[-] Endpoint: {}, Start time: {}".format(opt_endpoint, start_time))
+        helper.log_debug("[-] Endpoint: {}, End time: {}".format(opt_endpoint, end_time))
 
 
         # Paging 
         # slice time range to day by day
-        helper.log_debug("opt_paging_interval: {}".format(opt_paging_interval))
-        helper.log_debug("opt_paging_interval_unit: {}".format(opt_paging_interval_unit))
+        helper.log_debug("[-] Endpoint: {}, opt_paging_interval: {}".format(opt_endpoint, opt_paging_interval))
+        helper.log_debug("[-] Endpoint: {}, opt_paging_interval_unit: {}".format(opt_endpoint, opt_paging_interval_unit))
 
         # get the paging interval from UI, o.w. set it to 1 day
         if opt_paging_interval and opt_paging_interval_unit:
@@ -152,16 +146,13 @@ def collect_events(helper, ew):
         else:
             steps = 60*60*24
         
-        helper.log_debug("Paging steps: {}".format(steps))
+        helper.log_debug("[-] Endpoint: {}, Paging steps: {}".format(opt_endpoint, steps))
 
         time_list = get_slice_time(start_time, end_time, steps, helper)
-        # helper.log_debug("[-] time_list -- {}".format(time_list))
         request_cnt = 0
         for time in time_list:
             cur_start_time = time[0]           
             cur_end_time = time[1]
-            helper.log_debug("[-] cur_start_time for {}: {}".format(opt_endpoint, cur_start_time))
-            helper.log_debug("[-] cur_end_time for {}: {}".format(opt_endpoint, cur_end_time))
             #  Update Parameters
             params.update({"mode": "historical"})
             params.update({"opt_endpoint": opt_endpoint})
@@ -173,12 +164,12 @@ def collect_events(helper, ew):
             offset = 1
             while (records == params['limit']):
                 request_cnt += 1
-                helper.log_debug("current_offset: {}".format(offset))
+                helper.log_debug("[-] Endpoint: {}, current_offset: {}".format(params['opt_endpoint'], offset))
                 params['offset'] = offset
-                helper.log_debug("[-] {} Ingestion Interval: {}-{}, WebEx Request start time for {} (Local time zone): {}".format(request_cnt, cur_start_time, cur_end_time, params['opt_endpoint'], datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
+                helper.log_debug("[-] Endpoint: {}, {} Ingestion Interval: {}-{}, WebEx Request start time (Local time zone): {}".format(params['opt_endpoint'], request_cnt, cur_start_time, cur_end_time, datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
                 records = fetch_webex_logs(ew, helper, params)
-                helper.log_debug("[-] {} Ingestion Interval: {}-{}, WebEx Request end time for {} (Local time zone): {}".format(request_cnt, cur_start_time, cur_end_time, params['opt_endpoint'], datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
-                helper.log_debug("\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(
+                helper.log_debug("[-] Endpoint: {}, {} Ingestion Interval: {}-{}, WebEx Request end time (Local time zone): {}".format(params['opt_endpoint'], request_cnt, cur_start_time, cur_end_time, datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')))
+                helper.log_debug("[-] Endpoint: {}\t Offet:{}\tLimit: {}\tRecords Returned: {}".format(params['opt_endpoint'],
                     offset, params['limit'], records))
                 if records:
                     offset += records
