@@ -3,6 +3,8 @@ import sys
 import time
 import datetime
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from collections import defaultdict
 import json
 from datetime import date, timedelta
@@ -33,8 +35,8 @@ def fetch_webex_logs(ew, helper, params):
         params['opt_site_name'])
 
     headers = {
-        'Content-Type': 'application/xml',
-        'Connection': 'close'
+        'Content-Type': 'application/xml'
+        # 'Connection': 'close'
     }
 
     # Build Payload
@@ -44,8 +46,28 @@ def fetch_webex_logs(ew, helper, params):
         "[-] Endpoint: {}, Debug Fetch Request: {} - {}".format(params['opt_endpoint'], params['offset'], params['limit']))
 
     try:
-        response = requests.request(
-            "POST", url, headers=headers, data=payload, proxies=params['proxies'])
+        # use Requests (commnet out 'Connection': 'close' in line 39)
+        # response = requests.request(
+        #     "POST", url, headers=headers, data=payload, proxies=params['proxies'])
+
+        # use Session 
+        # requests.adapters.DEFAULT_RETRIES = 10
+        # session = requests.session()
+        # session.keep_alive = False       
+        # response = session.post(url, headers=headers, data=payload, proxies=params['proxies'])
+
+        #use Session with Retry + backoff factor
+        retry_strategy = Retry(
+            total=10,
+            backoff_factor = 1,
+            method_whitelist=["HEAD", "GET", "POST", "PUT", "OPTIONS"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session = requests.Session()
+        session.keep_alive = False
+        session.mount("https://", adapter)
+        response = session.post(url, headers=headers, data=payload, proxies=params['proxies'])
+
         helper.log_debug(
             "[-] Endpoint: {}, response.status_code: {}".format(params['opt_endpoint'], response.status_code))
         if response.status_code != 200:
