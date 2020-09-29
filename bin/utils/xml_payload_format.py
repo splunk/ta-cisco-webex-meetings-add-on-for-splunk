@@ -29,7 +29,7 @@ def xml_format(params):
         '''
     # Endpooint specific Payload
     TimeScope = ""
-    if endpoint == "LstmeetingusageHistory" or endpoint == "LstsupportsessionHistory" or endpoint == "LsttrainingsessionHistory" or endpoint == "LsteventsessionHistory":
+    if endpoint == "LstmeetingusageHistory" or endpoint == "LsttrainingsessionHistory" or endpoint == "LsteventsessionHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
 
@@ -48,6 +48,21 @@ def xml_format(params):
                             <sessionEndTimeEnd>{end_time}</sessionEndTimeEnd>
                         </endTimeScope>
         '''.format(start_time=start_time, end_time=end_time)
+    elif endpoint == "LstsupportsessionHistory":
+        endpoint = "java:com.webex.service.binding.history.{}".format(
+            endpoint)
+        TimeScope = '''
+                        <endTimeScope>
+                            <sessionEndTimeStart>{start_time}</sessionEndTimeStart>
+                            <sessionEndTimeEnd>{end_time}</sessionEndTimeEnd>
+                        </endTimeScope>
+        '''.format(start_time=start_time, end_time=end_time)
+        order = '''
+            <order>
+                <orderBy>CONFID</orderBy>
+                <orderAD>ASC</orderAD>
+            </order >
+        '''
     elif endpoint == "LstrecordaccessHistory":
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
