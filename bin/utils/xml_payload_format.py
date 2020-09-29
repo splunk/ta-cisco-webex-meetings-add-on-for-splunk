@@ -52,10 +52,10 @@ def xml_format(params):
         endpoint = "java:com.webex.service.binding.history.{}".format(
             endpoint)
         TimeScope = '''
-                        <viewTimeScope>
-                            <viewTimeStart>{start_time}</viewTimeStart>
-                            <viewTimeEnd>{end_time}</viewTimeEnd>
-                        </viewTimeScope>
+                        <creationTimeScope>
+                            <creationTimeStart>{start_time}</creationTimeStart>
+                            <creationTimeEnd>{end_time}</creationTimeEnd>
+                        </creationTimeScope>
         '''.format(start_time=start_time, end_time=end_time)
         order = '''
             <order>
