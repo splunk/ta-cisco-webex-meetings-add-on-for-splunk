@@ -49,6 +49,23 @@ fields = [
             min_len=0, 
             max_len=8192, 
         )
+    ),
+    field.RestField(
+        'paging_interval',
+        required=False,
+        encrypted=False,
+        default=None,
+        validator=validator.String(
+            min_len=0, 
+            max_len=8192, 
+        )
+    ),
+    field.RestField(
+        'paging_interval_unit',
+        required=False,
+        encrypted=False,
+        default=None,
+        validator=None
     ), 
 
     field.RestField(

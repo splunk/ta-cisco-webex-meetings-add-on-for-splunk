@@ -2,7 +2,7 @@
     "meta": {
         "name": "ta-cisco-webex-meetings-add-on-for-splunk",
         "displayName": "Cisco WebEx Meetings Add-on for Splunk",
-        "version": "1.1.4",
+        "version": "1.1.12",
         "apiVersion": "3.0.0",
         "restRoot": "ta_cisco_webex_meetings_add_on_for_splunk"
     },
@@ -48,11 +48,94 @@
                             }
                         },
                         {
-                            "field": "password",
-                            "label": "Password",
-                            "type": "text",
-                            "help": "Service Account Password",
+                            "field": "password_type",
+                            "label": "Authentication Type",
+                            "help": "Please choose an Authenticatoin Type",
                             "required": true,
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [{
+                                        "value": "password",
+                                        "label": "Basic Password Auth"
+                                    },
+                                    {
+                                        "value": "webExAccessToken",
+                                        "label": "OAuth"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "password"
+                        },
+                        {
+                            "field": "redirect_uri",
+                            "label": "Redirect URI",
+                            "type": "text",
+                            "help": "Must match the Redirect URI defined in your Webex Meetings Integration configuration. For example, https://{{hostname}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "https://{{hostname}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth"
+                            }
+                        },         
+                        {
+                            "field": "client_id",
+                            "label": "Client ID",
+                            "type": "text",
+                            "help": "Client ID for WebEx Oauth Integration App",
+                            "required": false,
+                            "defaultValue": "",
+                            "encrypted": false,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "client_secret",
+                            "label": "Client Secret",
+                            "type": "text",
+                            "help": "Client Secret for WebEx Oauth Integration App",
+                            "required": false,
+                            "defaultValue": "*  *  *",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "password",
+                            "label": "Password / Access Token",
+                            "type": "text",
+                            "help": "Enter the Service Account Password or Generate the Access Token by clicking the below button",
+                            "required": true,
+                            "defaultValue": "*  *  *",
+                            "encrypted": true,
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of password is 8192"
+                            }]
+                        },
+                        {
+                            "field": "refresh_token",
+                            "label": "Refresh Token",
+                            "type": "text",
+                            "help": "Enter the Refresh Token",
+                            "required": false,
                             "defaultValue": "*  *  *",
                             "encrypted": true,
                             "validators": [{
@@ -235,6 +318,14 @@
                     {
                         "field": "start_time_start",
                         "label": "Begin Time"
+                    },
+                    {
+                        "field": "paging_interval",
+                        "label": "Paging Interval"
+                    },
+                    {
+                        "field": "paging_interval_unit",
+                        "label": "Paging Interval Unit"
                     }
                 ],
                 "actions": [
@@ -410,7 +501,7 @@
                         {
                             "field": "start_time_start",
                             "label": "Begin Time",
-                            "help": "This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                            "help": "This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ss\n\nNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
                             "required": true,
                             "type": "text",
                             "validators": [{
@@ -421,6 +512,60 @@
                             }],
                             "options": {
                                 "placeholder": "04/01/2020 00:00:00"
+                            }
+                        },
+                        {
+                            "field": "paging_interval",
+                            "label": "Paging Interval",
+                            "help": "Please enter an integer. This is used to slice the large time range. For example, if it is set to 1 day, the data will be ingested day by day. Format: Int.",
+                            "required": false,
+                            "type": "text",
+                            "defaultValue": "1",
+                            "validators": [{
+                                "type": "string",
+                                "minLength": 0,
+                                "maxLength": 8192,
+                                "errorMsg": "Max length of text input is 8192"
+                            }],
+                            "options": {
+                                "placeholder": "1"
+                            }
+                        },
+                        {
+                            "field": "paging_interval_unit",
+                            "label": "Paging Interval Unit",
+                            "help": "Choose the unit of the paging interval.",
+                            "required": false,
+                            "type": "singleSelect",
+                            "defaultValue": "Day",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [
+                                    {
+                                        "value": "Second",
+                                        "label": "Second"
+                                    },
+                                    {
+                                        "value": "Minute",
+                                        "label": "Minute"
+                                    },
+                                    {
+                                        "value": "Hour",
+                                        "label": "Hour"
+                                    },
+                                    {
+                                        "value": "Day",
+                                        "label": "Day"
+                                    },
+                                    {
+                                        "value": "Week",
+                                        "label": "Week"
+                                    },
+                                    {
+                                        "value": "Year",
+                                        "label": "Year"
+                                    }
+                                ]
                             }
                         }
                     ]

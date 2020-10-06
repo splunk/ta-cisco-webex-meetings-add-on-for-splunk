@@ -43,6 +43,26 @@ If you are managing the site from **Control Hub**, please take a look at this li
 
 Alternatively, [Add-Users-Manually-in-Cisco-Webex-Control-Hub ](https://help.webex.com/en-us/v71ztb/Add-Users-Manually-in-Cisco-Webex-Control-Hub ) can also be a workaround if you have AD Connector setup as well.
 
+#### Create a Webex Meetings OAuth Integration App
+
+An integration is what you'd have to use if you have Single Sign-On (SSO) or OAuth enabled in your Webex account and you are not able to create a Service Account. This requires you to be logged in to [Cisco DevNet](https://developer.cisco.com/site/webex-integration/) using a Webex Meetings Site Admin account. The dialog prompt for logging in to DevNet has the option to Login with Webex Meetings. Please make sure you pick the `Login with Webex Meetings` option, and other log in options will not work for this purpose. After login you can create a dedicated integeration app for this Add-on.
+- Log in to [Cisco DevNet](https://developer.cisco.com/site/webex-integration/) using a Webex Meetings Site Admin account.
+- Click on `Add App Information` button on the top right corner.
+- Enter the following details:
+    - **Integration name**: Enter a integration name as you like. 
+    - **Redirect URI**: The Redirect URI **MUST** follow this pattern:
+
+    ```https://{{domain}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth```
+
+    Please replace the `{{domain}}` with the domain of your Splunk Heavy Forwarder (or IDM). For example, if the domain of your HF or IDM is `example.splunk.link`, the Redirect URI you have to enter is:
+
+    `https://example.splunk.link/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth`
+
+    **Note**: If your Splunk site is not in `en-US`, please change it to your true value. 
+    - **Scope**: Please **ONLY** pick `read_all`. **DO NOT** pick any other options.
+    - **Description**: Enter some details about what your integration does. This is optional. 
+- Click on `Submit` button.
+- Please copy the `Client ID` and `Client Secret` somewhere for further use.
 
 #### Installation and Configuration Steps
 This application can be installed on-prem and cloud.
@@ -58,34 +78,58 @@ The configuration steps are common for `on-prem` and `cloud`. Please follow the 
 1. Open the Web UI for the Heavy Forwarder (or IDM).
 2. Access the TA from the list of applications.
 3. Set global setings.
-- Click on `Configuration` button on the top left corner.
-- Click on `Add-on Settings` button.
-- Enter the following details:
-  - **Site Name** (_required_): This identifies the Webex site you are targeting with your add-on. For example, if the URL is `https://splunk.webex.com`, the Webex Site that you have to enter is `splunk`.
-  - **Username** (_required_): Service Account Username or E-mail address of the host or admin account making the request. For example: `splunker@splunk.com`.
-  - **Password** (_required_): Password of the account associated with the e-mail address above. The password will be masked.
-- Click on the `Save` green button.
+If you use a Webex Service Account, please refer to Section 3.1 to set global settings. If you have Single Sign-On (SSO) or OAuth enabled in your Webex accout, please refer to Section 3.2 to set global settings. 
+    ###### 3.1 Set global settings for Webex Service Account
+    Please refer to [Create a Service Account](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk#create-a-service-account) section to create a Sevice Account first. 
+    - Click on `Configuration` button on the top left corner.
+    - Click on `Add-on Settings` button.
+    - Enter the following details:
+      - **Site Name** (**_required_**): This identifies the Webex site you are targeting with your add-on. For example, if the URL is `https://splunk.webex.com`, the Webex Site that you have to enter is `splunk`.
+      - **Username** (**_required_**): Service Account Username or E-mail address of the host or admin account making the request. For example: `splunker@example.com`.
+      - **Authentication Type** (**_required_**): Please select `Basic Password Auth` for Webex Service Account.
+      - **Redirect URI** (_optional_): **Please leave it blank**. (Redirect URI is optional for Basic Password Auth type.)
+      - **Client ID** (_optional_): **Please leave it blank**. (Client ID is optional for Basic Password Auth type.) 
+      - **Client Secret** (_optional_): **Please leave it blank**. (Client Secret is optional for Basic Password Auth type.) 
+      - **Password / Access Token** (**_required_**): Password of the account associated with the e-mail address above. The password will be masked.
+      - **Refresh Token** (_optional_): **Please leave it blank**. (Refresh Token is optional for Basic Password Auth type.) 
+    - Click on the `Save` green button.
+    ###### 3.2 Set global settings for OAuth
+    Please refer to [Create a Webex Meetings OAuth Integration App](https://github.com/splunk/ta-cisco-webex-meetings-add-on-for-splunk#create-a-webex-meetings-oauth-integration-app) section to create a integration app first.
+    - Click on `Configuration` button on the top left corner.
+    - Click on `Add-on Settings` button.
+    - Enter the following details:
+      - **Site Name** (**_required_**): This identifies the Webex site you are targeting with your add-on. For example, if the URL is `https://splunk.webex.com`, the Webex Site that you have to enter is `splunk`.
+      - **Username** (**_required_**): Service Account Username or E-mail address of the host or admin account making the request. For example: `splunker@example.com`.
+      - **Authentication Type** (**_required_**): Please select `OAuth` for SSO/OAuth enabled account.
+      - **Redirect URI** (**_required_**): Please enter the Redirect URI of your Webex Meetings Integration App. It **MUST** match the Redirect URI that is defined in your Webex Meetings Integration configuration. For example, https://{{domain}}/en-US/splunkd/__raw/services/cisco-webex-meetings-oauth. (Redirect URI is required for OAuth type.)
+      - **Client ID** (**_required_**): Please enter the Client ID of your Webex Meetings Integration App that you create for this Add-on. (Client ID is required for OAuth type.) 
+      - **Client Secret** (**_required_**): Please enter the Client Secret of your Webex Meetings Integration App that you create for this Add-on. (Client Secret is required for OAuth type.)
+      - **Password / Access Token** (**_required_**): To get the Access Token, please click `Generate Tokens` button under the text box. (**Note**: Please make sure you enter the correct `Client ID` and `Client Secret` at the last steps.) In the pop-up window, enter your email/username, and hit `Next`. Click the `Accept` button to grant the permissions. You should see your `Access Token` and `Refresh Token`. Copy & paste the `Access Token` here. (**Note**: If you see the error messages, e.g. "Invalid client secret", please close the pop-up window, enter the correct client secret, and re-click the `Generate Tokens` to start over it again.)
+      - **Refresh Token** (**_required_**): Copy & paste the `Refresh Token` that obtained from the last step here. (Refresh Token is required for OAuth type.)
+    - Click on the `Save` green button.
 4. Create input for active scheduled sessions .
 - Click on `Inputs` button on the top left corner.
 - Click on `Create New Input` button on the top right corner.
 - Select `General Service`
-- Enter the following details in the pop up box:
+- Enter the following details in the pop-up box:
     - **Name** (_required_): Unique name for the data input.
     - **Interval** (_required_): Time interval of input in seconds. **Note**: Interval should be 60 or less for general service session data.
     - **Index** (_required_): Index for storing data.
     - **Monitor Active Session**: Please make sure `Monitor Active Session` is checked.
-- Click on the `Add` green button on the bottom right of the pop up box.
+- Click on the `Add` green button on the bottom right of the pop-up box.
  5. Create input for historical meetings.
  - Click on `Inputs` button on the top left corner.
  - Click on `Create New Input` button on the top right corner.
  - Select `History Service`
- - Enter the following details in the pop up box:
+ - Enter the following details in the pop-up box:
     - **Name** (_required_): Unique name for the data input.
     - **Interval** (_required_): Time interval of input in seconds. **Note**: Interval should be 86400 (24 hours) or more for historical data
     - **Index** (_required_): Index for storing data.
     - **Endpoints** (_required_): Historical endpoints that are used to fetch historical data back.
     - **Begin Time** (_required_): This is the time from where you want to ingest the historical data. Please enter UTC time. Format: `MM/DD/YYYY hh:mm:ss` **NOTE**: Begin Date must be at least 3 days ago and ideally no more than 90 days.
-- Click on the `Add` green button on the bottom right of the pop up box.
+    - **Paging Interval**: Please enter an integer. This is used to slice the large time range. For example, if your `Begin Time` is set to be 2 months ago, and the two-month data volume is too large to be handled in the first ingestion. You can leverage the `Paging Interval` to slice the time range. If it is set to 1 day, it will ingest data day by day instead of ingesting the 2-month data at one time. The default value is 1 day. Format: Int.
+    - **Paging Interval Unit**: Choose the unit of the paging interval.
+- Click on the `Add` green button on the bottom right of the pop-up box.
 6. Set Proxy Setting (optional)
  - Click on `Configuration` button on the top left corner.
 - Click on `Proxy` button.

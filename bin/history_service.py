@@ -51,8 +51,16 @@ class ModInputhistory_service(modinput_wrapper.base_modinput.BaseModInput):
                                          required_on_create=True,
                                          required_on_edit=False))
         scheme.add_argument(smi.Argument("start_time_start", title="Begin Time",
-                                         description="This is the time from where you wwant to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ssNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
+                                         description="This is the time from where you want to ingest the historical data.  Please enter UTC time. Format: MM/DD/YYYY hh:mm:ssNOTE: Begin Date must be at least 3 days ago and ideally no more than 90 days.",
                                          required_on_create=True,
+                                         required_on_edit=False))
+        scheme.add_argument(smi.Argument("paging_interval", title="Paging Interval",
+                                         description="Please enter an integer. This is used to slice the large time range. For example, if it is set to 1 day, the data will be ingested day by day. Format: Int.",
+                                         required_on_create=False,
+                                         required_on_edit=False))
+        scheme.add_argument(smi.Argument("paging_interval_unit", title="Paging Interval Unit",
+                                         description="Choose the unit of the paging interval.",
+                                         required_on_create=False,
                                          required_on_edit=False))
         return scheme
 
