@@ -258,7 +258,7 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                 logging.info('[-] Proxy is not enabled')
                 return None
 
-            if proxy['proxy_username'] and proxy['proxy_password']:
+            if proxy.get('proxy_username', None) and proxy.get('proxy_password', None):
                 proxy_password_dict = json.loads(get_cred_from_password_storage(splunkService, realm, 'proxy``splunk_cred_sep``1'))
                 clear_proxy_password = proxy_password_dict['proxy_password']
 

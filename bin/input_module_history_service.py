@@ -63,7 +63,7 @@ def collect_events(helper, ew):
 
     proxy = helper.get_proxy()
     if proxy:
-        if proxy['proxy_username'] and proxy['proxy_password']:
+        if proxy.get('proxy_username', None) and proxy.get('proxy_password', None):
             proxy_auth = "{}:{}".format(
                 proxy['proxy_username'], proxy['proxy_password'])
             proxies = {
