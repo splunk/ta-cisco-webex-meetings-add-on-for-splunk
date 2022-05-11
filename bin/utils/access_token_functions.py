@@ -7,7 +7,7 @@ import splunklib.client as client
 SPLUNK_DEST_APP = 'ta-cisco-webex-meetings-add-on-for-splunk'
 
 
-def get_access_token_by_refresh_token(helper, client_id, client_secret, refresh_token, redirect_uri):
+def get_access_token_by_refresh_token(helper, client_id, client_secret, refresh_token, redirect_uri, proxies):
 
     url = "https://api.webex.com/v1/oauth2/token"
 
@@ -23,7 +23,7 @@ def get_access_token_by_refresh_token(helper, client_id, client_secret, refresh_
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload, proxies=proxies)
         helper.log_debug(
             "[-] GET Access Token from Refresh Token: response.status_code: {}".format(response.status_code))
         if response.status_code != 200:
@@ -112,7 +112,7 @@ def update_access_token_with_validation(helper, params):
     if access_token is None:
         # Check if the refresh token from UI is valid to avoid user enter a wrong refresh token
         first_time_access_token, first_time_refresh_token, expires_in = get_access_token_by_refresh_token(
-            helper, params['opt_client_id'], params['opt_client_secret'], params['opt_refresh_token'], redirect_uri)
+            helper, params['opt_client_id'], params['opt_client_secret'], params['opt_refresh_token'], redirect_uri, params['proxies'])
 
         # save the valid refresh token and access token
         if first_time_access_token:
@@ -157,7 +157,7 @@ def update_access_token_with_validation(helper, params):
                 helper.log_debug(
                     "################# EXPIRED ##################")
                 new_access_token, new_refresh_token, expires_in = get_access_token_by_refresh_token(helper,
-                                                                                                    params['opt_client_id'], params['opt_client_secret'], refresh_token, redirect_uri)
+                                                                                                    params['opt_client_id'], params['opt_client_secret'], refresh_token, redirect_uri, params['proxies'])
 
                 # update access_token in password storage
                 update_cred_in_password_storage(

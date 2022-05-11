@@ -37,12 +37,18 @@ def collect_events(helper, ew):
 
     proxy = helper.get_proxy()
     if proxy:
-        proxy_auth = "{}:{}".format(
-            proxy['proxy_username'], proxy['proxy_password'])
-        proxies = {
-            "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port']),
-            "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy, host=proxy['proxy_url'], port=proxy['proxy_port'])
-        }
+        if proxy.get('proxy_username', None) and proxy.get('proxy_password', None):
+            proxy_auth = "{}:{}".format(
+                proxy['proxy_username'], proxy['proxy_password'])
+            proxies = {
+                "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy_auth, host=proxy['proxy_url'], port=proxy['proxy_port']),
+                "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy_auth, host=proxy['proxy_url'], port=proxy['proxy_port'])
+            }
+        else:
+            proxies = {
+                "https": "{protocol}://{host}:{port}/".format(protocol=proxy['proxy_type'], host=proxy['proxy_url'], port=proxy['proxy_port']),
+                "http": "{protocol}://{host}:{port}/".format(protocol=proxy['proxy_type'], host=proxy['proxy_url'], port=proxy['proxy_port'])
+            }
     else:
         proxies = None
 

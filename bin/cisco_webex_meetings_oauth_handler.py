@@ -7,7 +7,16 @@ import requests
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "utils"))
 import splunklib.client as client
 
+if sys.version_info[0] < 3:
+    py_version = "aob_py2"
+else:
+    py_version = "aob_py3"
+sys.path.insert(0, os.path.sep.join([os.path.dirname(__file__), 'ta_cisco_webex_meetings_add_on_for_splunk', py_version]))
+from solnlib import conf_manager
+from solnlib.utils import is_true
+
 SPLUNK_DEST_APP = 'ta-cisco-webex-meetings-add-on-for-splunk'
+
 
 if sys.platform == "win32":
     import msvcrt
@@ -106,9 +115,11 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
         session_key = request['session']['authtoken']
         splunkService = client.connect(token=session_key, app=SPLUNK_DEST_APP)
 
+        logging.debug('[-] getting proxy...')
+        proxies = self.getProxyDetails(session_key, splunkService)
+
         realm = 'ta-cisco-webex-meetings-add-on-for-splunk'
         creds_key = "creds_key"
-
         if method == "POST":
             try:
                 form_params = flatten_query_params(request['form'])
@@ -147,12 +158,7 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
 
                     # get the code from request
                     query_params = flatten_query_params(request['query'])
-                    # logging.debug('query_params: {}'.format(query_params))
                     code = query_params['code']
-                    # code = code.encode('utf8')
-
-                    # redirect_uri = "http://{hostname}:{splunk_web_port}/{splunk_site}/splunkd/__raw/services/cisco-webex-meetings-oauth".format(
-                    #     hostname=hostname, splunk_web_port=splunk_web_port, splunk_site=splunk_site)
                     logging.debug("redirect_uri -- {}".format(redirect_uri))
 
                     url = "https://api.webex.com/v1/oauth2/token"
@@ -170,7 +176,7 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
                     }
 
                     response = requests.request(
-                        "POST", url, headers=headers, data=payload)
+                        "POST", url, headers=headers, data=payload, proxies=proxies)
 
                     logging.debug(
                         "response code -- {}".format(response.status_code))
@@ -237,3 +243,37 @@ class CiscoWebexMeetingsOauthHandler(PersistentServerConnectionApplication):
         callback after the request completes.
         """
         pass
+
+    def getProxyDetails(self, session_key, splunkService):
+        try:
+            # Create confmanger object for the app with realm
+            realm = "__REST_CREDENTIAL__#ta-cisco-webex-meetings-add-on-for-splunk#configs/conf-ta_cisco_webex_meetings_add_on_for_splunk_settings"
+            cfm = conf_manager.ConfManager(session_key, SPLUNK_DEST_APP, realm=realm)
+            # Get Conf object of apps settings
+            conf = cfm.get_conf('ta_cisco_webex_meetings_add_on_for_splunk_settings')
+            # Get proxy stanza from the settings
+            proxy = conf.get("proxy", True)
+
+            if not proxy or not is_true(proxy.get('proxy_enabled')):
+                logging.info('[-] Proxy is not enabled')
+                return None
+
+            if proxy.get('proxy_username', None) and proxy.get('proxy_password', None):
+                proxy_password_dict = json.loads(get_cred_from_password_storage(splunkService, realm, 'proxy``splunk_cred_sep``1'))
+                clear_proxy_password = proxy_password_dict['proxy_password']
+
+                proxy_auth = "{}:{}".format(
+                    proxy['proxy_username'], clear_proxy_password)
+                proxies = {
+                    "https": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy_auth, host=proxy['proxy_url'], port=proxy['proxy_port']),
+                    "http": "{protocol}://{auth}@{host}:{port}/".format(protocol=proxy['proxy_type'], auth=proxy_auth, host=proxy['proxy_url'], port=proxy['proxy_port'])
+                }
+            else:
+                proxies = {
+                    "https": "{protocol}://{host}:{port}/".format(protocol=proxy['proxy_type'], host=proxy['proxy_url'], port=proxy['proxy_port']),
+                    "http": "{protocol}://{host}:{port}/".format(protocol=proxy['proxy_type'], host=proxy['proxy_url'], port=proxy['proxy_port'])
+                }
+
+            return proxies
+        except Exception as e:
+            logging.error('[-] Error happened while getting proxy details: {}'.format(str(e)))
