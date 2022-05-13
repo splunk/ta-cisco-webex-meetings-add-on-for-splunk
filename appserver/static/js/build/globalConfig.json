@@ -2,7 +2,7 @@
     "meta": {
         "name": "ta-cisco-webex-meetings-add-on-for-splunk",
         "displayName": "Cisco WebEx Meetings Add-on for Splunk",
-        "version": "1.1.13",
+        "version": "1.1.14",
         "apiVersion": "3.0.0",
         "restRoot": "ta_cisco_webex_meetings_add_on_for_splunk"
     },
@@ -104,7 +104,7 @@
                             "field": "client_secret",
                             "label": "Client Secret",
                             "type": "text",
-                            "help": "Client Secret for WebEx Oauth Integration App",
+                            "help": "Client Secret for WebEx Oauth Integration App Generate tokens by clicking the below button",
                             "required": false,
                             "defaultValue": "*  *  *",
                             "encrypted": true,
@@ -119,7 +119,7 @@
                             "field": "password",
                             "label": "Password / Access Token",
                             "type": "text",
-                            "help": "Enter the Service Account Password or Generate the Access Token by clicking the below button",
+                            "help": "Enter the Service Account Password or Generate the Access Token",
                             "required": true,
                             "defaultValue": "*  *  *",
                             "encrypted": true,
